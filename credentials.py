@@ -31,6 +31,7 @@ desired_cap = {
 desired_cap_PlayStore = desired_cap
 desired_cap_PlayStore["appium:appPackage"] = PLAYSTORE_APP_PACKAGE
 desired_cap_PlayStore["appium:appActivity"] = PLAYSTORE_APP_ACTIVITY
+desired_cap_PlayStore["appium:automationName"] = "Appium"
 # Initiating test report
 report = ['Main test case', 'Detailed step', 'Intended number of tests', 'Start Time', 'End Time', 'Duration',
           'Actual number of tests', 'Pass', 'Fail', 'Success Rate', 'Remarks', 'Details']

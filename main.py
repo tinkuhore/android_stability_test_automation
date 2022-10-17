@@ -154,7 +154,7 @@ def playstore_test():
                 for i in l1:
                     if i.text == APP_NAME:
                         i.click()
-                        # start the download
+                        # start the download if not installed already
                         time.sleep(3)
                         for j in driver.find_elements(AppiumBy.CLASS_NAME, "android.widget.Button"):
                             if j.text == "Install":
@@ -1228,9 +1228,6 @@ def Email_Stability_Test():
                                                 '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.RelativeLayout/android.widget.ScrollView/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.RelativeLayout[1]/android.widget.RelativeLayout/android.widget.RelativeLayout/android.view.ViewGroup/android.widget.EditText')
                 receipent.send_keys('swarnendu0298@gmail.com')
                 driver.press_keycode(66)
-
-                # time.sleep(2)
-
                 subject = driver.find_element(AppiumBy.ID, 'com.google.android.gm:id/subject')
                 subject.send_keys('Here is my subject line!!')
                 time.sleep(2)
@@ -1241,28 +1238,31 @@ def Email_Stability_Test():
                 send_email = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send')
                 send_email.click()
                 time.sleep(3)
-                # Sent or Failed
-                if "mail sent":  # write pass condition here
+                # Pass or Fail
+                try:
+                    driver.find_element(AppiumBy.XPATH,
+                                        '//android.widget.LinearLayout[@content-desc="Sent"]/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.TextView[1]')
                     pass_count += 1
-                    # delete mail
-                    menu = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Open navigation drawer')
-                    menu.click()
-                    time.sleep(2)
-                    sent_mails = driver.find_element(AppiumBy.XPATH,
-                                                     '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/androidx.drawerlayout.widget.DrawerLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.support.v7.widget.RecyclerView/android.widget.LinearLayout[10]/android.widget.LinearLayout')
-                    sent_mails.click()
-                    time.sleep(3)
+                except:
+                    fail_count += 1
+                # delete mail
+                menu = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Open navigation drawer')
+                menu.click()
+                time.sleep(2)
+                sent_mails = driver.find_element(AppiumBy.XPATH,
+                                                 '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/androidx.drawerlayout.widget.DrawerLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.support.v7.widget.RecyclerView/android.widget.LinearLayout[10]/android.widget.LinearLayout')
+                sent_mails.click()
+                time.sleep(3)
+                try:
                     actions = TouchAction(driver)
-                    actions.long_press(x=105, y=563)
+                    actions.tap(x=97, y=710)
                     actions.release().perform()
                     time.sleep(2)
                     Delete = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Delete')
                     Delete.click()
                     time.sleep(3)
-                else:
-                    print(f"Iteration = {test_count}| Failed to sent Mail! | with Error : {e}")
-                    fail_count += 1
-
+                except:
+                    print("Failed to Delete as touch sensor did not work.")
 
             except Exception as e:
                 print(f"Iteration = {test_count}| Failed to sent Mail! | with Error : {e}")
@@ -1327,8 +1327,12 @@ def Email_Stability_Test():
                 send_email.click()
                 time.sleep(8)
                 # Sent or Failed
-                if "mail sent":  # write pass condition here
+                try:
+                    driver.find_element(AppiumBy.XPATH,
+                                        '//android.widget.LinearLayout[@content-desc="Sent"]/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.TextView[1]')
                     pass_count += 1
+                except:
+                    fail_count += 1
                     # delete mail
                     menu = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Open navigation drawer')
                     menu.click()
@@ -1336,22 +1340,19 @@ def Email_Stability_Test():
                     sent_mails = driver.find_element(AppiumBy.XPATH,
                                                      '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/androidx.drawerlayout.widget.DrawerLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.support.v7.widget.RecyclerView/android.widget.LinearLayout[10]/android.widget.LinearLayout')
                     sent_mails.click()
-                    time.sleep(3)
-                    actions = TouchAction(driver)
-                    actions.long_press(x=105, y=563)
-                    actions.release().perform()
                     time.sleep(2)
-                    Delete = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Delete')
-                    Delete.click()
-                    time.sleep(3)
-                else:
-                    print(f"Iteration = {test_count}| Failed to sent Mail! | with Error : {e}")
-                    fail_count += 1
-
-
+                    try:
+                        actions = TouchAction(driver)
+                        actions.tap(x=97, y=710)
+                        actions.release().perform()
+                        time.sleep(2)
+                        Delete = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Delete')
+                        Delete.click()
+                        time.sleep(3)
+                    except:
+                        print("Failed to Delete as touch sensor did not work.")
             except Exception as e:
                 print(f"Iteration = {test_count}| Failed to sent Mail! | with Error : {e}")
-                fail_count += 1
             test_count += 1
 
         end = datetime.datetime.now()
