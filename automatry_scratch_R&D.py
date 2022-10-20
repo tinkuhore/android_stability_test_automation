@@ -1696,6 +1696,74 @@ def Telephony_Stability_Test():
     """
     print('\n', "-" * 10, ">> Telephony Stability Test <<", "-" * 10, '\n')
     report[0] = "Browser Stability Test"
+
+    def call_from_phone_book(iterate=50):
+        print('\n', "Event 1 : Make a Call from Phone Book. ")
+        # test report initiation
+        report[1] = 'Make a Call from Phone Book.'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        # loop variable initiation
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                pass
+            except Exception as e:
+                print(f"Iteration = {test_count}| Failed to Receive Call ! | with Error : {e}")
+            test_count += 1
+
+        end = datetime.datetime.now()
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 1 completed!")
+
+
+    def call_from_history(iterate=50):
+        print('\n', "Event 2 : Make a Voice Call from History List. ")
+        # test report initiation
+        report[1] = 'Make a Voice Call from History List.'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        # loop variable initiation
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                pass
+            except Exception as e:
+                print(f"Iteration = {test_count}| Failed to Receive Call ! | with Error : {e}")
+            test_count += 1
+
+        end = datetime.datetime.now()
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 2 completed!")
+
     def receive_a_call(iterate=50):
         print('\n', "Event 3 : Receive a Call ")
         # test report initiation
@@ -1720,7 +1788,8 @@ def Telephony_Stability_Test():
                 flag = True
                 while flag:
                     output = subprocess.check_output(
-                        f"adb -s {DEVICE2_NAME} shell " + '"dumpsys telephony.registry | grep ' + "'mCallState'", shell=True)
+                        f"adb -s {DEVICE2_NAME} shell " + '"dumpsys telephony.registry | grep ' + "'mCallState'",
+                        shell=True)
                     call_state = str(output).split(" ")[2].split("=")[1][0]  # this can lead to Error
                     if call_state == '1':
                         print("Call State is -> ringing")
@@ -1748,27 +1817,29 @@ def Telephony_Stability_Test():
                 print(f"Iteration = {test_count}| Failed to Receive Call ! | with Error : {e}")
             test_count += 1
 
-            end = datetime.datetime.now()
-            # finishing test report
-            report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-            report[5] = str(end - start).split('.')[0]
-            report[6] = test_count
-            report[7] = pass_count
-            report[8] = fail_count
-            report[9] = round((pass_count / test_count) * 100, 2)
-            report[10] = None
-            report[11] = None
+        end = datetime.datetime.now()
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
 
-            # insert test report to csv file
-            with open('automation_stability_test.csv', 'a') as f:
-                writer(f).writerow(report)
-                f.close()
-            print("\n", "Telephony automation completed!")
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 3 completed!")
 
     # Check VoLTE Status
     VoLTE = subprocess.check_output("adb shell settings get global volte_vt_enabled")
     if VoLTE == 1:
         print("VoLTE is Enabled.")
+        call_from_phone_book()
+        call_from_history()
         receive_a_call()
         print('\n', "-" * 10, ">> Telephony Stability Test Completed! <<", "-" * 10, '\n')
     else:
