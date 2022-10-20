@@ -1697,46 +1697,83 @@ def Telephony_Stability_Test():
     print('\n', "-" * 10, ">> Telephony Stability Test <<", "-" * 10, '\n')
     report[0] = "Browser Stability Test"
     def receive_a_call(iterate=50):
+        print('\n', "Event 3 : Top websites ")
+        # test report initiation
+        report[1] = 'Top websites'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        # loop variable initiation
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                driver1 = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap)
+                driver2 = webdriver.Remote("http://localhost:1234/wd/hub", desired_cap_2)
+                # Make Phone Call(Device 1)
+                driver1.activate_app(DIALER_APP_PACKAGE)
+                time.sleep(2)
+                [driver1.press_keycode(int(i) + 7) for i in PH_NUMBER]  # dialing ph no
+                time.sleep(2)
+                driver1.press_keycode(5)  # tab dial button
+                time.sleep(5)
+                # Detect Phone Call (Device 2)
+                flag = True
+                while flag:
+                    output = subprocess.check_output(
+                        f"adb -s {DEVICE2_NAME} shell " + '"dumpsys telephony.registry | grep ' + "'mCallState'", shell=True)
+                    call_state = str(output).split(" ")[2].split("=")[1][0]  # this can lead to Error
+                    if call_state == '1':
+                        print("Call State is -> ringing")
+                        # Answer the call
+                        time.sleep(3)
+                        driver2.press_keycode(5)
+                        time.sleep(6)
+                        output = subprocess.check_output(
+                            f"adb -s {DEVICE2_NAME} shell " + '"dumpsys telephony.registry | grep ' + "'mCallState'",
+                            shell=True)
+                        call_state = str(output).split(" ")[2].split("=")[1][0]  # this can lead to Error
+                        if call_state == 2:
+                            pass_count += 1
+                            driver2.press_keycode(6)
+                        else:
+                            fail_count += 1
+                        driver2.quit()
+                        flag = False
+                    else:
+                        print(f"Unable to find the Device with name - {DEVICE2_NAME}.")
 
-        driver1 = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap)
-        driver2 = webdriver.Remote("http://localhost:1234/wd/hub", desired_cap_2)
-        # Make Phone Call(Device 1)
-        driver1.activate_app(DIALER_APP_PACKAGE)
-        time.sleep(2)
-        [driver1.press_keycode(int(i) + 7) for i in PH_NUMBER]  # dialing ph no
-        time.sleep(2)
-        driver1.press_keycode(5)  # tab dial button
-        time.sleep(5)
-        # Detect Phone Call (Device 2)
-        flag = True
-        while flag:
-            output = subprocess.check_output(
-                f"adb -s {DEVICE2_NAME} shell " + '"dumpsys telephony.registry | grep ' + "'mCallState'", shell=True)
-            print(output)
-            call_state = str(output).split(" ")[2].split("=")[1][0]  # this can lead to Error
-            if call_state == '1':
-                print("Call State is -> ringing")
-                # Answer the call
-                time.sleep(3)
-                driver2.press_keycode(5)
-                time.sleep(10)
-                driver2.press_keycode(6)
-                driver2.quit()
-                flag = False
-            else:
-                print(f"Unable to find the Device with name - {DEVICE2_NAME}.")
+                driver1.press_keycode(6)
+                driver1.quit()
+            except Exception as e:
+                print(f"Iteration = {test_count}| Failed to Receive Call ! | with Error : {e}")
+            test_count += 1
 
-        driver1.press_keycode(6)
-        driver1.quit()
+            end = datetime.datetime.now()
+            # finishing test report
+            report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+            report[5] = str(end - start).split('.')[0]
+            report[6] = test_count
+            report[7] = pass_count
+            report[8] = fail_count
+            report[9] = round((pass_count / test_count) * 100, 2)
+            report[10] = None
+            report[11] = None
+
+            # insert test report to csv file
+            with open('automation_stability_test.csv', 'a') as f:
+                writer(f).writerow(report)
+                f.close()
+            print("\n", "Telephony automation completed!")
 
     # Check VoLTE Status
     VoLTE = subprocess.check_output("adb shell settings get global volte_vt_enabled")
     if VoLTE == 1:
         print("VoLTE is Enabled.")
         receive_a_call()
+        print('\n', "-" * 10, ">> Telephony Stability Test Completed! <<", "-" * 10, '\n')
     else:
         print(f"VoLTE is Disabled. "
-              f"Please turn it ON to perform {Telephony_Stability_Test()}")
+              "Please turn it ON to perform Telephony_Stability_Test")
 
 
 Messaging_Stability_Tests()
