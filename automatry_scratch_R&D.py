@@ -16,7 +16,7 @@ PLATFORM_VERSION_2 = "6"
 HOME_APP_PACKAGE = "com.sec.android.app.launcher"
 HOME_APP_ACTIVITY = "com.sec.android.app.launcher.activities.LauncherActivity"
 # different app packages
-PHONE_APP_PACKAGE = "com.samsung.android.dialer"  # or "com.android.phone"
+DIALER_APP_PACKAGE = "com.samsung.android.dialer"  # or "com.android.phone"
 MSG_APP_PACKAGE = "com.samsung.android.messaging"
 CONTACTS_APP_PACKAGE = "com.samsung.android.app.contacts"
 PLAYSTORE_APP_PACKAGE = "com.android.vending"
@@ -612,7 +612,7 @@ def Multitasking_Stability_Test():
 
     # # MAKE A CALL
     try:
-        driver.activate_app(PHONE_APP_PACKAGE)
+        driver.activate_app(DIALER_APP_PACKAGE)
         time.sleep(2)
         [i.click() for i in driver.find_elements(AppiumBy.ID, "androidhwext:id/content") if i.text == "Phone"]
         time.sleep(2)
@@ -1697,9 +1697,9 @@ def Telephony_Stability_Test():
     print('\n', "-" * 10, ">> Telephony Stability Test <<", "-" * 10, '\n')
     report[0] = "Browser Stability Test"
     def receive_a_call(iterate=50):
-        print('\n', "Event 3 : Top websites ")
+        print('\n', "Event 3 : Receive a Call ")
         # test report initiation
-        report[1] = 'Top websites'
+        report[1] = 'Receive a Call'
         report[2] = iterate
         report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         # loop variable initiation
