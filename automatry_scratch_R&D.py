@@ -9,8 +9,8 @@ from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.common.touch_action import TouchAction
 
 # constant parameters
-DEVICE1_NAME = "RZ8N91E8TPM"
-PLATFORM_VERSION_1 = "12"
+DEVICE1_NAME = "J9F4C18206001450"
+PLATFORM_VERSION_1 = "9"
 DEVICE2_NAME = "Y3215A0210MS040998192"
 PLATFORM_VERSION_2 = "6"
 HOME_APP_PACKAGE = "com.sec.android.app.launcher"
@@ -1697,6 +1697,26 @@ def Telephony_Stability_Test():
     print('\n', "-" * 10, ">> Telephony Stability Test <<", "-" * 10, '\n')
     report[0] = "Browser Stability Test"
 
+    def phone_book():
+        contacts = subprocess.check_output("adb shell content query --uri content://contacts/phones/", shell=True)
+
+        l = str(contacts).split(",")
+
+        numbers = []
+        names = []
+        for i in l:
+            if "Row:" in i:
+                no = i.split("number=")[-1]
+                numbers.append(no)
+            if "display_name=" in i:
+                name = i.split("=")[-1]
+                names.append(name)
+        contact_list = {}
+        for i in range(len(numbers)):
+            if len(numbers[i]) < 15:
+                contact_list[names[i]] = numbers[i]
+        return names
+
     def call_from_phone_book(iterate=50):
         print('\n', "Event 1 : Make a Call from Phone Book. ")
         # test report initiation
@@ -1708,7 +1728,20 @@ def Telephony_Stability_Test():
         start = datetime.datetime.now()
         while test_count < iterate:
             try:
-                pass
+                contacts = phone_book()
+                driver = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap)
+                time.sleep(1)
+                driver.press_keycode(207)  # contacts
+                driver.find_element(AppiumBy.ACCESSIBILITY_ID, "Search query").click()  # Search
+                driver.find_element(AppiumBy.ACCESSIBILITY_ID, "Search query").send_keys(contacts[test_count])
+                driver.press_keycode(66)  # Enter
+                time.sleep(2)
+                for i in driver.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == contacts[test_count]:
+                        i.click()
+                        break
+                driver.press_keycode(3)  # Home
+                driver.quit()
             except Exception as e:
                 print(f"Iteration = {test_count}| Failed to Receive Call ! | with Error : {e}")
             test_count += 1
@@ -1729,7 +1762,6 @@ def Telephony_Stability_Test():
             writer(f).writerow(report)
             f.close()
         print("\n", "Event 1 completed!")
-
 
     def call_from_history(iterate=50):
         print('\n', "Event 2 : Make a Voice Call from History List. ")
@@ -1835,22 +1867,23 @@ def Telephony_Stability_Test():
         print("\n", "Event 3 completed!")
 
     # Check VoLTE Status
-    VoLTE = subprocess.check_output("adb shell settings get global volte_vt_enabled")
-    if VoLTE == 1:
+    VoLTE = str(subprocess.check_output("adb -s J9F4C18206001450 shell settings get global volte_vt_enabled", shell=True))
+    if '1' in VoLTE:
         print("VoLTE is Enabled.")
-        call_from_phone_book()
-        call_from_history()
-        receive_a_call()
+        call_from_phone_book(3)
+        # call_from_history()
+        # receive_a_call()
         print('\n', "-" * 10, ">> Telephony Stability Test Completed! <<", "-" * 10, '\n')
     else:
         print(f"VoLTE is Disabled. "
               "Please turn it ON to perform Telephony_Stability_Test")
 
 
-Messaging_Stability_Tests()
-Email_Stability_Test()
-Browser_Stability_Test()
-Multimedia_Stability_Test()
-Multitasking_Stability_Test()
-wifi(2)
-playstore_test()
+# Messaging_Stability_Tests()
+# Email_Stability_Test()
+# Browser_Stability_Test()
+# Multimedia_Stability_Test()
+# Multitasking_Stability_Test()
+# wifi(2)
+# playstore_test()
+Telephony_Stability_Test()
