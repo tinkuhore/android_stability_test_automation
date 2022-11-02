@@ -1867,7 +1867,8 @@ def Telephony_Stability_Test():
         print("\n", "Event 3 completed!")
 
     # Check VoLTE Status
-    VoLTE = str(subprocess.check_output("adb -s J9F4C18206001450 shell settings get global volte_vt_enabled", shell=True))
+    VoLTE = str(
+        subprocess.check_output("adb -s J9F4C18206001450 shell settings get global volte_vt_enabled", shell=True))
     if '1' in VoLTE:
         print("VoLTE is Enabled.")
         call_from_phone_book(3)
