@@ -8,41 +8,6 @@ from appium import webdriver
 from appium.webdriver.common.appiumby import AppiumBy
 from appium.webdriver.common.touch_action import TouchAction
 
-# constant parameters
-DEVICE1_NAME = "PT99653CA1AC1800106"
-PLATFORM_VERSION_1 = "11"
-DEVICE2_NAME = "J9F4C18206001450"
-PLATFORM_VERSION_2 = "9"
-HOME_APP_PACKAGE = "com.sec.android.app.launcher"
-HOME_APP_ACTIVITY = "com.sec.android.app.launcher.activities.LauncherActivity"
-# different app packages
-DIALER_APP_PACKAGE = "com.google.android.dialer"  # or "com.android.phone"
-MSG_APP_PACKAGE = "com.samsung.android.messaging"
-CONTACTS_APP_PACKAGE = "com.samsung.android.app.contacts"
-PLAYSTORE_APP_PACKAGE = "com.android.vending"
-CAMERA_APP_PACKAGE = "com.sec.android.app.camera"
-CHROME_APP_PACKAGE = "com.android.chrome"
-BG_APPS = [CONTACTS_APP_PACKAGE, MSG_APP_PACKAGE, CAMERA_APP_PACKAGE, CHROME_APP_PACKAGE, PLAYSTORE_APP_PACKAGE]
-
-PH_NUMBER = "9614929765"
-APP_NAME = "Sudoku offline"  # Complete name of the app available in PlayStore(** Case Sensitive)
-
-desired_cap = {
-    "appium:deviceName": DEVICE1_NAME,
-    "platformName": "Android",
-    "appium:platformVersion": PLATFORM_VERSION_1,
-    # "appium:appPackage": HOME_APP_PACKAGE,
-    # "appium:appActivity": HOME_APP_ACTIVITY,
-    "appium:adbExecTimeout": "30000",
-    "appium:automationName": "UiAutomator2",
-    "appium:uiautomator2ServerInstallTimeout": "90000",
-    "appium:noReset": "true",
-    "appium:fullReset": "false"
-}
-# Initiating test report
-report = ['Main test case', 'Detailed step', 'Intended number of tests', 'Start Time', 'End Time', 'Duration',
-          'Actual number of tests', 'Pass', 'Fail', 'Success Rate', 'Remarks', 'Details']
-
 # create csv file if not exists
 if not os.path.isfile('automation_stability_test.csv'):
     with open('automation_stability_test.csv', 'a') as f:
@@ -1697,42 +1662,18 @@ def Telephony_Stability_Test():
     print('\n', "-" * 10, ">> Telephony Stability Test <<", "-" * 10, '\n')
     report[0] = "Telephony Stability Test"
 
-    def create_contact(driver):
-        driver.press_keycode(3)
-        itr = 1
-        while itr <= 50:
-            driver.press_keycode(207)
-            time.sleep(1)
-            driver.find_element(AppiumBy.ACCESSIBILITY_ID, "Create contact").click()
-            time.sleep(1)
-            [i.send_keys(f"test{itr}") for i in driver.find_elements(AppiumBy.CLASS_NAME, "android.widget.EditText") if
-             i.text == "First name"]
-            time.sleep(1)
-            [i.send_keys("9614929765") for i in driver.find_elements(AppiumBy.CLASS_NAME, "android.widget.EditText") if
-             i.text == "Phone"]
-            time.sleep(1)
-            driver.find_element(AppiumBy.ID, "com.google.android.contacts:id/menu_save").click()
-            driver.press_keycode(3)
-            itr += 1
-
     def call_from_phone_book(iterate=50):
         print('\n', "Event 1 : Make a Call from Phone Book. ")
         # test report initiation
         report[1] = 'Make a Call from Phone Book.'
         report[2] = iterate
         report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        # contact list
-        contacts = subprocess.check_output(
-            f"adb -s {DEVICE1_NAME} shell content query --uri content://com.android.contacts/data/phones/ --projection display_name",
-            shell=True)
-        l = str(contacts).split("Row:")
-        count = len([i for i in l if i.split("=")[-1][:4] == 'test'])
 
-        driver1 = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap)
-        driver2 = webdriver.Remote("http://localhost:1234/wd/hub", desired_cap_2)
+        driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+        driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
 
-        if count != 50:
-            create_contact(driver1)
+        if contacts() != 50:
+            create_contact(driver=driver1, n=3)
         # loop variable initiation
         pass_count, fail_count, test_count = 0, 0, 0
         start = datetime.datetime.now()
@@ -1743,14 +1684,14 @@ def Telephony_Stability_Test():
                 driver1.press_keycode(207)  # contacts
                 time.sleep(2)
                 driver1.find_element(AppiumBy.ID,
-                                    "com.google.android.contacts:id/open_search_bar_text_view").click()  # Search
+                                     "com.google.android.contacts:id/open_search_bar_text_view").click()  # Search
                 time.sleep(3)
                 [driver1.press_keycode(ord(i) - 36) for i in "TEST"]
-                [driver1.press_keycode(int(i)+7) for i in str(test_count+1)]
+                [driver1.press_keycode(int(i) + 7) for i in str(test_count + 1)]
                 driver1.press_keycode(66)  # Enter
                 time.sleep(2)
                 for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    if i.text == f"test{test_count+1}":
+                    if i.text == f"test{test_count + 1}":
                         i.click()
                         break
                 driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Call").click()  # Call
@@ -1779,12 +1720,12 @@ def Telephony_Stability_Test():
                         flag = False
 
                 time.sleep(2)
-                driver1.press_keycode(4)   # Back
+                driver1.press_keycode(4)  # Back
                 driver1.press_keycode(4)  # Back
                 driver1.press_keycode(3)  # Home
 
             except Exception as e:
-                print(f"Iteration = {test_count+1}| Failed to make Call from Phone Book ! | with Error : {e}")
+                print(f"Iteration = {test_count + 1}| Failed to make Call from Phone Book ! | with Error : {e}")
             test_count += 1
         driver1.quit()
         driver2.quit()
@@ -1812,8 +1753,8 @@ def Telephony_Stability_Test():
         report[2] = iterate
         report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
-        driver1 = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap)
-        driver2 = webdriver.Remote("http://localhost:1234/wd/hub", desired_cap_2)
+        driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+        driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
 
         # loop variable initiation
         pass_count, fail_count, test_count = 0, 0, 0
@@ -1824,9 +1765,10 @@ def Telephony_Stability_Test():
                 driver1.press_keycode(3)
                 driver1.activate_app(DIALER_APP_PACKAGE)
                 time.sleep(1)
-                [i.click() for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView") if i.text == "Recent"]
+                [i.click() for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView") if
+                 i.text == "Recent"]
                 time.sleep(1)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "call test1").click() # making a Call
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "call test1").click()  # making a Call
                 time.sleep(3)
                 # Detect Phone Call (Device 2)
                 flag = True
@@ -1857,7 +1799,7 @@ def Telephony_Stability_Test():
                 driver1.press_keycode(4)
 
             except Exception as e:
-                print(f"Iteration = {test_count+1}| Failed to make Call from History! | with Error : {e}")
+                print(f"Iteration = {test_count + 1}| Failed to make Call from History! | with Error : {e}")
             test_count += 1
 
         driver1.quit()
@@ -1886,8 +1828,8 @@ def Telephony_Stability_Test():
         report[2] = iterate
         report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
-        driver1 = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap)
-        driver2 = webdriver.Remote("http://localhost:1234/wd/hub", desired_cap_2)
+        driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+        driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
 
         # loop variable initiation
         pass_count, fail_count, test_count = 0, 0, 0
@@ -1969,6 +1911,459 @@ def Telephony_Stability_Test():
               "Please turn it ON to perform Telephony_Stability_Test")
 
 
+def Video_Telephony_Stability_Test():
+    """
+        Telephony Stability Test
+        """
+    print('\n', "-" * 10, ">> Video Telephony Stability Test <<", "-" * 10, '\n')
+    report[0] = "Video Telephony Stability Test"
+
+    def make_vcall_from_phonebook(iterate=50):
+        print('\n', "Event 1 : Make a Video Call from Phone Book. ")
+        # test report initiation
+        report[1] = 'Make a Video Call from Phone Book.'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+        driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
+        driver1.set_network_connection(0)
+        driver2.set_network_connection(0)
+
+        if contacts() != iterate:
+            create_contact(driver=driver1, n=iterate)
+        # loop variable initiation
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                driver1.press_keycode(3)
+                time.sleep(1)
+                driver1.press_keycode(207)  # contacts
+                time.sleep(2)
+                driver1.find_element(AppiumBy.ID,
+                                     "com.google.android.contacts:id/open_search_bar_text_view").click()  # Search
+                time.sleep(3)
+                [driver1.press_keycode(ord(i) - 36) for i in "TEST"]
+                [driver1.press_keycode(int(i) + 7) for i in str(test_count + 1)]
+                driver1.press_keycode(66)  # Enter
+                time.sleep(2)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == f"test{test_count + 1}":
+                        i.click()
+                        break
+                driver1.find_element(AppiumBy.ID, "com.google.android.contacts:id/verb_video").click()  # Call
+                print("-----> MO Called.")
+                time.sleep(2)
+                flag = True
+                while flag:
+                    output = subprocess.check_output(
+                        f"adb -s {DEVICE2_NAME} shell " + 'dumpsys telephony.registry | grep ' + "'mCallState'",
+                        shell=True)
+                    call_state = str(output).split(" ")[4].split("=")[-1][0]  # this can lead to Error
+                    if call_state == '1':
+                        # Answer the call
+                        time.sleep(3)
+                        driver2.press_keycode(5)
+                        print("-----> MT Received.")
+                        time.sleep(CALL_DURATION)  # Call Duration
+                        output = subprocess.check_output(
+                            f"adb -s {DEVICE1_NAME} shell " + 'dumpsys telephony.registry | grep ' + "'mCallState'",
+                            shell=True)
+                        call_state = str(output).split(" ")[8].split("=")[-1][0]  # this can lead to Error
+                        if call_state == '2':
+                            pass_count += 1
+                            driver1.press_keycode(6)
+                            print("-----> MO Disconnected.")
+                        else:
+                            fail_count += 1
+
+                        flag = False
+
+                time.sleep(2)
+                driver1.press_keycode(4)  # Back
+                driver1.press_keycode(4)  # Back
+                driver1.press_keycode(3)  # Home
+
+            except Exception as e:
+                print(f"Iteration = {test_count + 1}| Failed to make Video Call from Phone Book ! | with Error : {e}")
+            test_count += 1
+        driver1.press_keycode(207)  # contacts
+        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "More options").click()
+        time.sleep(1)
+        [i.click() for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView") if
+         i.text == "Select all"]
+        time.sleep(1)
+        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Delete").click()
+        time.sleep(1)
+        driver1.find_element(AppiumBy.ID, "android:id/button1").click()
+        time.sleep(2)
+        driver1.press_keycode(3)  # Home
+        driver1.quit()
+        driver2.quit()
+        end = datetime.datetime.now()
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 1 completed!")
+
+    def make_vcall_from_dialer(iterate=50):
+        print('\n', "Event 2 : Make a Video Call from Dialer ")
+        # test report initiation
+        report[1] = 'Make a Video Call from Dialer '
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+        driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
+        driver1.set_network_connection(0)
+        driver2.set_network_connection(0)
+
+        # loop variable initiation
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                # Make Phone Call(Device 1)
+                driver1.press_keycode(3)
+                driver1.activate_app(DIALER_APP_PACKAGE)
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "key pad").click()
+                time.sleep(2)
+                [driver1.press_keycode(int(i) + 7) for i in PH_NUMBER]  # dialing ph no
+                time.sleep(2)
+                [i.click() for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView") if
+                 i.text == "Video call"]  # tab dial button
+                print("-----> MO Called.")
+                time.sleep(2)
+                # Detect Phone Call (Device 2)
+                flag = True
+                while flag:
+                    output = subprocess.check_output(
+                        f"adb -s {DEVICE2_NAME} shell " + 'dumpsys telephony.registry | grep ' + "'mCallState'",
+                        shell=True)
+                    call_state = str(output).split(" ")[4].split("=")[-1][0]  # this can lead to Error
+                    if call_state == '1':
+                        # Answer the call
+                        time.sleep(3)
+                        driver2.press_keycode(5)
+                        print("-----> MT Received.")
+                        time.sleep(CALL_DURATION)
+                        output = subprocess.check_output(
+                            f"adb -s {DEVICE1_NAME} shell " + 'dumpsys telephony.registry | grep ' + "'mCallState'",
+                            shell=True)
+                        call_state = str(output).split(" ")[8].split("=")[-1][0]  # this can lead to Error
+                        if call_state == '2':
+                            pass_count += 1
+                            driver1.press_keycode(6)
+                            print("-----> MO Disconnected.")
+                        else:
+                            fail_count += 1
+
+                        flag = False
+
+                driver1.press_keycode(4)
+
+            except Exception as e:
+                print(f"Iteration = {test_count + 1}| Failed to Make a Video Call from Dialer ! | with Error : {e}")
+            test_count += 1
+
+        driver1.quit()
+        driver2.quit()
+        end = datetime.datetime.now()
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 2 completed!")
+
+    def receive_vcall(iterate=50):
+        print('\n', "Event 3 : Receive a Video Call ")
+        # test report initiation
+        report[1] = 'Receive a Video Call'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+        driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
+        driver1.set_network_connection(0)
+        driver2.set_network_connection(0)
+
+        # loop variable initiation
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                # Make Phone Call(Device 1)
+                driver1.press_keycode(3)
+                driver1.activate_app(DIALER_APP_PACKAGE)
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "key pad").click()
+                time.sleep(2)
+                [driver1.press_keycode(int(i) + 7) for i in PH_NUMBER]  # dialing ph no
+                time.sleep(2)
+                [i.click() for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView") if
+                 i.text == "Video call"]  # tab dial button
+                print("-----> MO Called.")
+                time.sleep(2)
+                # Detect Phone Call (Device 2)
+                flag = True
+                while flag:
+                    output = subprocess.check_output(
+                        f"adb -s {DEVICE2_NAME} shell " + 'dumpsys telephony.registry | grep ' + "'mCallState'",
+                        shell=True)
+                    call_state = str(output).split(" ")[4].split("=")[-1][0]  # this can lead to Error
+                    if call_state == '1':
+                        # Answer the call
+                        time.sleep(3)
+                        driver2.press_keycode(5)
+                        print("-----> MT Received.")
+                        time.sleep(CALL_DURATION)
+                        output = subprocess.check_output(
+                            f"adb -s {DEVICE2_NAME} shell " + 'dumpsys telephony.registry | grep ' + "'mCallState'",
+                            shell=True)
+                        call_state = str(output).split(" ")[4].split("=")[-1][0]  # this can lead to Error
+                        if call_state == '2':
+                            pass_count += 1
+                            driver2.press_keycode(6)
+                            print("-----> MT Disconnected.")
+                        else:
+                            fail_count += 1
+
+                        flag = False
+
+                driver1.press_keycode(4)
+
+            except Exception as e:
+                print(f"Iteration = {test_count + 1}| Failed to Receive a Video Call ! | with Error : {e}")
+            test_count += 1
+        driver1.toggle_wifi()
+        driver2.toggle_wifi()
+        driver1.quit()
+        driver2.quit()
+        end = datetime.datetime.now()
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 3 completed!")
+
+    def receive_vcall_wifi(iterate=50):
+        print('\n', "Event 4 : Receive a Video Call - WiFi. ")
+        # test report initiation
+        report[1] = 'Receive a Video Call - WiFi.'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+        driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
+
+        # loop variable initiation
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                # Make Phone Call(Device 1)
+                driver1.press_keycode(3)
+                driver1.activate_app(DIALER_APP_PACKAGE)
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "key pad").click()
+                time.sleep(2)
+                [driver1.press_keycode(int(i) + 7) for i in PH_NUMBER]  # dialing ph no
+                time.sleep(2)
+                [i.click() for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView") if
+                 i.text == "Video call"]  # tab dial button
+                print("-----> MO Called.")
+                time.sleep(2)
+                # Detect Phone Call (Device 2)
+                flag = True
+                while flag:
+                    output = subprocess.check_output(
+                        f"adb -s {DEVICE2_NAME} shell " + 'dumpsys telephony.registry | grep ' + "'mCallState'",
+                        shell=True)
+                    call_state = str(output).split(" ")[4].split("=")[-1][0]  # this can lead to Error
+                    if call_state == '1':
+                        # Answer the call
+                        time.sleep(3)
+                        driver2.press_keycode(5)
+                        print("-----> MT Received.")
+                        time.sleep(CALL_DURATION)
+                        output = subprocess.check_output(
+                            f"adb -s {DEVICE1_NAME} shell " + 'dumpsys telephony.registry | grep ' + "'mCallState'",
+                            shell=True)
+                        call_state = str(output).split(" ")[8].split("=")[-1][0]  # this can lead to Error
+                        if call_state == '2':
+                            pass_count += 1
+                            driver1.press_keycode(6)
+                            print("-----> M0 Disconnected.")
+                        else:
+                            fail_count += 1
+
+                        flag = False
+                    # else:
+                    #     print(f"Unable to find the Device with name - {DEVICE2_NAME}.")
+
+                driver1.press_keycode(4)
+
+            except Exception as e:
+                print(f"Iteration = {test_count + 1}| Failed to Receive a Video Call ! | with Error : {e}")
+            test_count += 1
+
+        driver1.quit()
+        driver2.quit()
+        end = datetime.datetime.now()
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 4 completed!")
+
+    def make_vcall_from_dialer_wifi(iterate=50):
+        print('\n', "Event 5 : Make a Video Call from Dialer - WiFi ")
+        # test report initiation
+        report[1] = 'Make a Video Call from Dialer - WiFi '
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+        driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
+
+        # loop variable initiation
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                # Make Phone Call(Device 1)
+                driver1.press_keycode(3)
+                driver1.activate_app(DIALER_APP_PACKAGE)
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "key pad").click()
+                time.sleep(2)
+                [driver1.press_keycode(int(i) + 7) for i in PH_NUMBER]  # dialing ph no
+                time.sleep(2)
+                [i.click() for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView") if
+                 i.text == "Video call"]  # tab dial button
+                print("-----> MO Called.")
+                time.sleep(2)
+                # Detect Phone Call (Device 2)
+                flag = True
+                while flag:
+                    output = subprocess.check_output(
+                        f"adb -s {DEVICE2_NAME} shell " + 'dumpsys telephony.registry | grep ' + "'mCallState'",
+                        shell=True)
+                    call_state = str(output).split(" ")[4].split("=")[-1][0]  # this can lead to Error
+                    if call_state == '1':
+                        # Answer the call
+                        time.sleep(3)
+                        driver2.press_keycode(5)
+                        print("-----> MT Received.")
+                        time.sleep(CALL_DURATION)
+                        output = subprocess.check_output(
+                            f"adb -s {DEVICE1_NAME} shell " + 'dumpsys telephony.registry | grep ' + "'mCallState'",
+                            shell=True)
+                        call_state = str(output).split(" ")[8].split("=")[-1][0]  # this can lead to Error
+                        if call_state == '2':
+                            pass_count += 1
+                            driver1.press_keycode(6)
+                            print("-----> MO Disconnected.")
+                        else:
+                            fail_count += 1
+
+                        flag = False
+
+                driver1.press_keycode(4)
+
+            except Exception as e:
+                print(f"Iteration = {test_count + 1}| Failed to Make a Video Call from Dialer - WiFi ! | with Error : {e}")
+            test_count += 1
+
+        driver1.quit()
+        driver2.quit()
+        end = datetime.datetime.now()
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 5 completed!")
+
+    # Check VoLTE Status
+    VoLTE = str(
+        subprocess.check_output(f"adb -s {DEVICE1_NAME} shell settings get global volte_vt_enabled", shell=True))
+    if '1' in VoLTE:
+        print("VoLTE is Enabled.")
+        make_vcall_from_phonebook(1)
+        make_vcall_from_dialer(1)
+        receive_vcall(1)
+        print('\n', "-" * 10, ">> Telephony Stability Test Completed! <<", "-" * 10, '\n')
+    else:
+        print(f"VoLTE is Disabled. "
+              "Please turn it ON to perform Video_Telephony_Stability_Test over VoLTE.")
+
+    # Check VoLTE Status
+    WIFI = str(
+        subprocess.check_output(f"adb -s {DEVICE1_NAME} shell settings get global wifi_on", shell=True))
+    if '1' in WIFI:
+        print("WIFI is Enabled.")
+        receive_vcall_wifi(1)
+        make_vcall_from_dialer_wifi(1)
+    else:
+        print(f"WIFI is Disabled. "
+              "Please turn it ON to perform Video_Telephony_Stability_Test over WIFI.")
+
+    print('\n', "-" * 10, ">> Video Telephony Stability Test Completed! <<", "-" * 10, '\n')
+
+
 # Messaging_Stability_Tests()
 # Email_Stability_Test()
 # Browser_Stability_Test()
@@ -1976,5 +2371,5 @@ def Telephony_Stability_Test():
 # Multitasking_Stability_Test()
 # wifi(2)
 # playstore_test()
-
-Telephony_Stability_Test()
+# Telephony_Stability_Test()
+Video_Telephony_Stability_Test()
