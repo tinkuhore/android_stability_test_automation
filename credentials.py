@@ -6,7 +6,7 @@ PLATFORM_VERSION_2 = "9"
 HOME_APP_PACKAGE = "com.huawei.android.launcher"
 HOME_APP_ACTIVITY = ".unihome.UniHomeLauncher"
 # different app packages
-DIALER_APP_PACKAGE = 'com.google.android.dialer'  # or "com.android.phone"
+DIALER_APP_PACKAGE = 'com.google.android.dialer' # or "com.android.phone"
 MSG_APP_PACKAGE = "com.android.mms"
 CONTACTS_APP_PACKAGE = "com.google.android.contacts"
 PLAYSTORE_APP_PACKAGE = "com.android.vending"

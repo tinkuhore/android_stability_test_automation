@@ -1851,7 +1851,8 @@ def Telephony_Stability_Test():
                             fail_count += 1
 
                         flag = False
-
+                    # else:
+                    #     print(f"Unable to find the Device with name - {DEVICE2_NAME}.")
 
                 driver1.press_keycode(4)
 
