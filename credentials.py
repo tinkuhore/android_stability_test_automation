@@ -1,21 +1,22 @@
 # constant parameters
-DEVICE1_NAME = "J9F4C18206001450"
-PLATFORM_VERSION_1 = "9"
-DEVICE2_NAME = "Y3215A0210MS040998192"
-PLATFORM_VERSION_2 = "6"
+DEVICE1_NAME = "PT99653CA1AC1800106"
+PLATFORM_VERSION_1 = "11"
+DEVICE2_NAME = "J9F4C18206001450"
+PLATFORM_VERSION_2 = "9"
 HOME_APP_PACKAGE = "com.huawei.android.launcher"
 HOME_APP_ACTIVITY = ".unihome.UniHomeLauncher"
 # different app packages
-DIALER_APP_PACKAGE = 'com.samsung.android.dialer' # or "com.android.phone"
+DIALER_APP_PACKAGE = 'com.google.android.dialer' # or "com.android.phone"
 MSG_APP_PACKAGE = "com.android.mms"
-CONTACTS_APP_PACKAGE = "com.android.contacts"
+CONTACTS_APP_PACKAGE = "com.google.android.contacts"
 PLAYSTORE_APP_PACKAGE = "com.android.vending"
 PLAYSTORE_APP_ACTIVITY = "com.google.android.finsky.activities.MainActivity"
 CAMERA_APP_PACKAGE = "com.huawei.camera"
 CHROME_APP_PACKAGE = "com.android.chrome"
 BG_APPS = [CONTACTS_APP_PACKAGE, MSG_APP_PACKAGE, CAMERA_APP_PACKAGE, CHROME_APP_PACKAGE, PLAYSTORE_APP_PACKAGE]
 
-PH_NUMBER = "121"
+PH_NUMBER = "9614929765"
+CALL_DURATION = 5
 APP_NAME = "Sudoku offline"  # Complete name of the app available in PlayStore(** Case Sensitive)
 
 # desired capabilities dictionary
@@ -30,11 +31,11 @@ desired_cap = {
     "appium:fullReset": "false"
 }
 
-desired_cap_2 = desired_cap
+desired_cap_2 = desired_cap.copy()
 desired_cap_2["appium:deviceName"] = DEVICE2_NAME
 desired_cap_2["appium:platformVersion"] = PLATFORM_VERSION_2
 
-desired_cap_PlayStore = desired_cap
+desired_cap_PlayStore = desired_cap.copy()
 desired_cap_PlayStore["appium:appPackage"] = PLAYSTORE_APP_PACKAGE
 desired_cap_PlayStore["appium:appActivity"] = PLAYSTORE_APP_ACTIVITY
 desired_cap_PlayStore["appium:automationName"] = "Appium"
