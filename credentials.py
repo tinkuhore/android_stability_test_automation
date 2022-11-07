@@ -17,7 +17,7 @@ CAMERA_APP_PACKAGE = "com.huawei.camera"
 CHROME_APP_PACKAGE = "com.android.chrome"
 BG_APPS = [CONTACTS_APP_PACKAGE, MSG_APP_PACKAGE, CAMERA_APP_PACKAGE, CHROME_APP_PACKAGE, PLAYSTORE_APP_PACKAGE]
 
-PH_NUMBER = "9614929765"
+PH_NUMBER = "9614929765"  # "7029972335"
 CALL_DURATION = 5
 APP_NAME = "Sudoku offline"  # Complete name of the app available in PlayStore(** Case Sensitive)
 
