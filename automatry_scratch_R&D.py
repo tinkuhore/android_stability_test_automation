@@ -24,7 +24,7 @@ def wifi(iterate):
     report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
     # Starting Appium webdriver
-    driver = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap)
+    driver = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
     driver.press_keycode(3)
     driver.set_network_connection(0)
 
@@ -35,6 +35,7 @@ def wifi(iterate):
             driver.toggle_wifi()
             time.sleep(10)
             driver.toggle_wifi()
+            time.sleep(2)
             pass_count += 1
 
         except Exception as e:
@@ -80,7 +81,7 @@ def playstore_test():
         report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
         # Starting Appium webdriver
-        driver = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap)
+        driver = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
         driver.press_keycode(3)
         driver.set_network_connection(6)
 
@@ -138,7 +139,7 @@ def playstore_test():
         start = datetime.datetime.now()
         while test_count <= iterate:
             # Starting Appium webdriver
-            driver = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_PlayStore)
+            driver = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_PlayStore)
             try:
                 # Automation Code
                 driver.set_network_connection(6)
@@ -227,7 +228,7 @@ def playstore_test():
         report[2] = iterate
         report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         # Starting Appium webdriver
-        driver = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap)
+        driver = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
         driver.press_keycode(3)
         driver.set_network_connection(6)
         # initiate loop variables
@@ -324,30 +325,22 @@ def playstore_test():
 def Messaging_Stability_Tests():
     """
     Messaging Stability Tests
-    1.
-    2.
-    3.Send an SMS maximum number of characters with out requiring the message to be segmented from the DUT.
-    4.
+    1.Send an SMS maximum number of characters without requiring the message to be segmented from the DUT (50)
+    2.Send a MMS with an audio attachment from the device under test (50)
+    3.Send a MMS with a video attachment from the device under test (50)
+    4.Send a MMS with a picture attachment from the device under test (50)
+    5.Open a MMS with a 1MB audio attachment or largest size supported by the device (50)
+    6.Open a MMS with 1MB video or largest size supported by the device (50)
+    7.Open a MMS with a 1MB image or largest size supported by the device (50)
+    8.Open a SMS (50)
     """
     print('\n', "-" * 10, ">> Messaging Stability Tests <<", "-" * 10, '\n')
+    report[0] = 'Messaging Stability Test'
 
-    desired_cap_message_stability = {
-        "appium:deviceName": "RZ8N91E8TPM",
-        "platformName": "Android",
-        "appium:appPackage": "com.samsung.android.messaging",
-        "appium:appActivity": "com.android.mms.ui.ConversationComposer",
-        "appium:platformVersion": "12",
-        "appium:adbExecTimeout": "30000",
-        "appium:automationName": "UiAutomator2",
-        "appium:uiautomator2ServerInstallTimeout": "90000",
-        "appium:noReset": "true",
-        "appium:fullReset": "false"
-    }
-
-    def mobile_originating_message_maxCharacters(iterate=20):
+    def send_sms_maxChar(iterate=20):
         """This function Automatically test the SMS service of the Messaging app."""
-        # test report
-        report[0] = 'SMS Automation'
+        print('\n', "Event 1 : Add an appointment to the Calender ")
+        # test report initiation
         report[
             1] = 'Send an SMS maximum number of characters with out requiring the message to be segmented from the DUT.'
         report[2] = iterate
@@ -356,54 +349,50 @@ def Messaging_Stability_Tests():
         pass_count, fail_count, test_count = 0, 0, 0
         start = datetime.datetime.now()
         while test_count < iterate:
-            # Automation Code
-            # send the message
-            driver = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_message_stability)
-            MT_contact = driver.find_element(AppiumBy.XPATH, '//android.widget.TextView[@content-desc="⁨My Jio⁩"]')
-            MT_contact.click()
-            time.sleep(2)
-            text_box = driver.find_element(AppiumBy.ID, 'com.samsung.android.messaging:id/message_edit_text')
-            text_box.send_keys(
-                '1234567890@#$%^&*()qwertyuiop[]sdfghjkl;qwertyuiopasdfghjklzxcvbnm,./;12345678901234567890!@#$%^&*('
-                ')qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfgjklzxcvbnm1234567890qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm12345678901!@#$%^&*()_+asdfghjklqwertyuopzxcvbnm')
-            send_message = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send')
-            send_message.click()
-            time.sleep(4)
-
-            # SENT or FAILED
             try:
-                driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Sending failed')
-                fail_count += 1
-            except:
-                pass_count += 1
+                # Automation Code
+                # send the message
+                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+                driver1.activate_app(MSG_APP_PACKAGE)
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
+                    PH_NUMBER_2)
+                driver1.press_keycode(66)
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ID,
+                                     'com.google.android.apps.messaging:id/compose_message_text').send_keys(
+                    '1234567890@#$%^&*()qwertyuiop[]sdfghjkl;qwertyuiopasdfghjklzxcvbnm,./;12345678901234567890!@#$%^&*('
+                    ')qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfgjklzxcvbnm1234567890qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm12345678901!@#$%^&*()_+asdfghjklqwertyuopzxcvbnm')
 
-            # Delete the message
-            time.sleep(2)
-            delete_settings = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Conversation settings')
-            delete_settings.click()
-            time.sleep(2)
-            delete_message = driver.find_element(AppiumBy.XPATH,
-                                                 '/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android'
-                                                 '.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout'
-                                                 '/android.view.ViewGroup/androidx.drawerlayout.widget.DrawerLayout/android'
-                                                 '.widget.FrameLayout['
-                                                 '2]/android.widget.LinearLayout/android.widget.FrameLayout/android.widget'
-                                                 '.RelativeLayout/android.widget.ScrollView/android.widget.LinearLayout'
-                                                 '/android.view.ViewGroup[1]/android.view.ViewGroup/android.widget.ImageView')
-            delete_message.click()
-            select_last_message = driver.find_element(AppiumBy.XPATH,
-                                                      '/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout'
-                                                      '/android.widget.FrameLayout/android.widget.LinearLayout/android.widget'
-                                                      '.FrameLayout/android.view.ViewGroup/androidx.drawerlayout.widget.DrawerLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.RelativeLayout/android.widget.RelativeLayout/androidx.recyclerview.widget.RecyclerView/android.widget.LinearLayout[3]/android.widget.LinearLayout/android.widget.CheckBox')
-            select_last_message.click()
-            delete_all = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Delete')
-            delete_all.click()
-            time.sleep(2)
-            move_to_recycle = driver.find_element(AppiumBy.ID, 'android:id/button1')
-            move_to_recycle.click()
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send SMS').click()
+                time.sleep(4)
+
+                # SENT or FAILED
+                try:
+                    if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Now, SMS').is_enabled():
+                        pass_count += 1
+                except:
+                    fail_count += 1
+
+                # Delete the message
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'More conversation options').click()
+                time.sleep(1)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "Delete":
+                        i.click()
+                        break
+                driver1.find_element(AppiumBy.ID, "android:id/button1").click()
+                time.sleep(2)
+                test_count += 1
+                driver1.press_keycode(4)
+                driver1.quit()
+            except Exception as e:
+                fail_count += 1
+                print(f"Iteration = {test_count + 1}| Failed to Send an SMS! | with Error : {e}")
             test_count += 1
-            driver.press_keycode(4)
-            driver.quit()
         end = datetime.datetime.now()
         # driver.quit()
 
@@ -421,6 +410,516 @@ def Messaging_Stability_Tests():
         with open('automation_stability_test.csv', 'a') as f:
             writer(f).writerow(report)
             f.close()
+        print("\n", "Event 1 completed!")
+
+    def send_mms_with_audio(iterate=20):
+        """This function Automatically test the MMS (Audio) service of the Messaging app."""
+        print('\n', "Event 2 : Send a MMS with an audio attachment")
+        # test report initiation
+        report[1] = 'Send a MMS with an audio attachment'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                # Automation Code
+                # send the MMS
+                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+                driver1.activate_app(MSG_APP_PACKAGE)
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
+                    PH_NUMBER_2)
+                driver1.press_keycode(66)
+                time.sleep(2)
+                # attatchment section
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Add files, location and more").click()
+                time.sleep(1)
+                driver1.find_element(AppiumBy.XPATH,
+                                     '//android.view.ViewGroup[@content-desc="Files"]/android.widget.ImageView').click()
+                time.sleep(2)
+                # file selection
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Show roots").click()
+                time.sleep(2)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView")[1:]:
+                    print(i.text)
+                    if i.text == "Downloads":
+                        i.click()
+                        break
+                try:
+                    driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "List View").click()
+                except:
+                    print("List View Enabled")
+
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "file_example_MP3_1MG.mp3":
+                        print(i.text)
+                        i.click()
+                        break
+                time.sleep(5)
+                driver1.find_element(AppiumBy.ID,
+                                     'com.google.android.apps.messaging:id/compose_message_text').send_keys(
+                    "1234567890@#$%^&*()qwertyuiop[]sdfghjkl;qwertyuiopasdfghjklzxcvbnm,"
+                    "./;12345678901234567890!@#$%^&*(")
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send SMS').click()
+                time.sleep(4)
+
+                # SENT or FAILED
+                try:
+                    if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Now, SMS').is_enabled():
+                        pass_count += 1
+                except:
+                    fail_count += 1
+
+                # Delete the message
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'More conversation options').click()
+                time.sleep(1)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "Delete":
+                        i.click()
+                        break
+                driver1.find_element(AppiumBy.ID, "android:id/button1").click()
+                time.sleep(2)
+                test_count += 1
+                driver1.press_keycode(4)
+                driver1.quit()
+            except Exception as e:
+                fail_count += 1
+                print(
+                    f"Iteration = {test_count + 1}| Failed to 'Send a MMS with an audio attachment'! | with Error : {e}")
+            test_count += 1
+        end = datetime.datetime.now()
+        # driver.quit()
+
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 2 completed!")
+
+    def send_mms_with_video(iterate=20):
+        """This function Automatically test the MMS (Video) service of the Messaging app."""
+        print('\n', "Event 3 : Send a MMS with a video attachment")
+        # test report initiation
+        report[1] = 'Send a MMS with a video attachment'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                # Automation Code
+                # send the MMS
+                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+                driver1.activate_app(MSG_APP_PACKAGE)
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
+                    PH_NUMBER_2)
+                driver1.press_keycode(66)
+                time.sleep(2)
+                # attatchment section
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Add files, location and more").click()
+                time.sleep(1)
+                driver1.find_element(AppiumBy.XPATH,
+                                     '//android.view.ViewGroup[@content-desc="Files"]/android.widget.ImageView').click()
+                time.sleep(2)
+                # file selection
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Show roots").click()
+                time.sleep(3)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    print(i.text)
+                    if i.text == "Downloads":
+                        i.click()
+                        break
+                # try:
+                #     driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "List View").click()
+                # except:
+                #     print("List View Enabled")
+                time.sleep(3)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "file_example_MP4_480_1_5MG.mp4":
+                        print(i.text)
+                        i.click()
+                        break
+                time.sleep(5)
+                driver1.find_element(AppiumBy.ID,
+                                     'com.google.android.apps.messaging:id/compose_message_text').send_keys(
+                    "1234567890@#$%^&*()qwertyuiop[]sdfghjkl;qwertyuiopasdfghjklzxcvbnm,"
+                    "./;12345678901234567890!@#$%^&*(")
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send SMS').click()
+                time.sleep(4)
+
+                # SENT or FAILED
+                try:
+                    if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Now, SMS').is_enabled():
+                        pass_count += 1
+                except:
+                    fail_count += 1
+
+                # Delete the message
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'More conversation options').click()
+                time.sleep(1)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "Delete":
+                        i.click()
+                        break
+                driver1.find_element(AppiumBy.ID, "android:id/button1").click()
+                time.sleep(2)
+                test_count += 1
+                driver1.press_keycode(4)
+                driver1.quit()
+            except Exception as e:
+                fail_count += 1
+                print(f"Iteration = {test_count + 1}| Failed to Send a MMS with a video attachment! | with Error : {e}")
+            test_count += 1
+        end = datetime.datetime.now()
+        # driver.quit()
+
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 3 completed!")
+
+    def send_mms_with_picture(iterate=20):
+        """This function Automatically test the MMS (Picture) service of the Messaging app."""
+        print('\n', "Event 4 : Send a MMS with a picture")
+        # test report initiation
+        report[1] = 'Send a MMS with a picture'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                # Automation Code
+                # send the MMS
+                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+                driver1.activate_app(MSG_APP_PACKAGE)
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
+                    PH_NUMBER_2)
+                driver1.press_keycode(66)
+                time.sleep(2)
+                # attachment section
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Add files, location and more").click()
+                time.sleep(1)
+                driver1.find_element(AppiumBy.XPATH,
+                                     '//android.view.ViewGroup[@content-desc="Files"]/android.widget.ImageView').click()
+                time.sleep(2)
+                # file selection
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Show roots").click()
+                time.sleep(3)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    print(i.text)
+                    if i.text == "Downloads":
+                        i.click()
+                        break
+                try:
+                    driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "List View").click()
+                except:
+                    print("List View Enabled")
+                time.sleep(3)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "file_example_JPG_1MB.jpg":
+                        print(i.text)
+                        i.click()
+                        break
+                time.sleep(5)
+                driver1.find_element(AppiumBy.ID,
+                                     'com.google.android.apps.messaging:id/compose_message_text').send_keys(
+                    "1234567890@#$%^&*()qwertyuiop[]sdfghjkl;qwertyuiopasdfghjklzxcvbnm,"
+                    "./;12345678901234567890!@#$%^&*(")
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send SMS').click()
+                time.sleep(4)
+
+                # SENT or FAILED
+                try:
+                    if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Now, SMS').is_enabled():
+                        pass_count += 1
+                except:
+                    fail_count += 1
+
+                # Delete the message
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'More conversation options').click()
+                time.sleep(1)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "Delete":
+                        i.click()
+                        break
+                driver1.find_element(AppiumBy.ID, "android:id/button1").click()
+                time.sleep(2)
+                test_count += 1
+                driver1.press_keycode(4)
+                driver1.quit()
+            except Exception as e:
+                fail_count += 1
+                print(f"Iteration = {test_count + 1}| Failed to Send a MMS with a picture! | with Error : {e}")
+            test_count += 1
+        end = datetime.datetime.now()
+        # driver.quit()
+
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 4 completed!")
+
+    def open_mms_with_audio(iterate=50):
+        """This function Automatically test the read MMS Audio service of the Messaging app."""
+        print('\n', "Event 5 : Open a MMS with a 1MB audio attachment")
+        # test report initiation
+        report[1] = 'Open a MMS with a 1MB audio attachment'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
+                driver2.activate_app(MSG_APP_PACKAGE)
+                time.sleep(1)
+                driver2.find_element(AppiumBy.ID,
+                                     "com.google.android.apps.messaging:id/open_search_bar_text_view").click()
+                time.sleep(1)
+                driver2.find_element(AppiumBy.ID,
+                                     "com.google.android.apps.messaging:id/zero_state_search_box_auto_complete").send_keys(
+                    PH_NUMBER_1)
+                driver2.press_keycode(66)
+                time.sleep(1)
+                for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if PH_NUMBER_1 in i.text:
+                        i.click()
+                        break
+                pass_count += 1
+
+            except Exception as e:
+                fail_count += 1
+                print(
+                    f"Iteration = {test_count + 1}| Failed to Open a MMS with a 1MB audio attachment! | with Error : {e}")
+            test_count += 1
+        end = datetime.datetime.now()
+        # driver.quit()
+
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 5 completed!")
+
+    def open_mms_with_video(iterate=50):
+        """This function Automatically test the read MMS Video service of the Messaging app."""
+        print('\n', "Event 6 : Open a MMS with 1MB video attachment")
+        # test report initiation
+        report[1] = 'Open a MMS with 1MB video attachment'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
+                driver2.activate_app(MSG_APP_PACKAGE)
+                time.sleep(1)
+                driver2.find_element(AppiumBy.ID,
+                                     "com.google.android.apps.messaging:id/open_search_bar_text_view").click()
+                time.sleep(1)
+                driver2.find_element(AppiumBy.ID,
+                                     "com.google.android.apps.messaging:id/zero_state_search_box_auto_complete").send_keys(
+                    PH_NUMBER_1)
+                driver2.press_keycode(66)
+                time.sleep(1)
+                for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if PH_NUMBER_1 in i.text:
+                        i.click()
+                        break
+                pass_count += 1
+
+            except Exception as e:
+                fail_count += 1
+                print(
+                    f"Iteration = {test_count + 1}| Failed to Open a MMS with 1MB video attachment! | with Error : {e}")
+            test_count += 1
+        end = datetime.datetime.now()
+        # driver.quit()
+
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 6 completed!")
+
+    def open_mms_with_video(iterate=50):
+        """This function Automatically test the read MMS Image service of the Messaging app."""
+        print('\n', "Event 6 : Open a MMS with a 1MB image attachment")
+        # test report initiation
+        report[1] = 'Open a MMS with a 1MB image attachment'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
+                driver2.activate_app(MSG_APP_PACKAGE)
+                time.sleep(1)
+                driver2.find_element(AppiumBy.ID,
+                                     "com.google.android.apps.messaging:id/open_search_bar_text_view").click()
+                time.sleep(1)
+                driver2.find_element(AppiumBy.ID,
+                                     "com.google.android.apps.messaging:id/zero_state_search_box_auto_complete").send_keys(
+                    PH_NUMBER_1)
+                driver2.press_keycode(66)
+                time.sleep(1)
+                for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if PH_NUMBER_1 in i.text:
+                        i.click()
+                        break
+                pass_count += 1
+
+            except Exception as e:
+                fail_count += 1
+                print(
+                    f"Iteration = {test_count + 1}| Failed to Open a MMS with a 1MB image attachment! | with Error : {e}")
+            test_count += 1
+        end = datetime.datetime.now()
+        # driver.quit()
+
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 7 completed!")
+
+    def open_sms(iterate=50):
+        """This function Automatically test the read SMS service of the Messaging app."""
+        print('\n', "Event 8 : Open a SMS (MT)")
+        # test report initiation
+        report[1] = 'Open a SMS (MT)'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
+                driver2.activate_app(MSG_APP_PACKAGE)
+                time.sleep(1)
+                driver2.find_element(AppiumBy.ID,
+                                     "com.google.android.apps.messaging:id/open_search_bar_text_view").click()
+                time.sleep(1)
+                driver2.find_element(AppiumBy.ID,
+                                     "com.google.android.apps.messaging:id/zero_state_search_box_auto_complete").send_keys(
+                    PH_NUMBER_1)
+                driver2.press_keycode(66)
+                time.sleep(1)
+                for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if PH_NUMBER_1 in i.text:
+                        i.click()
+                        break
+                pass_count += 1
+
+            except Exception as e:
+                fail_count += 1
+                print(f"Iteration = {test_count + 1}| Failed to Open a SMS (MT)! | with Error : {e}")
+            test_count += 1
+        end = datetime.datetime.now()
+        # driver.quit()
+
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 8 completed!")
 
     def MMS_with_MAXCHAR_AUDIO(iterate=20):
         """This function Automatically test the MMS service of Messaging app."""
@@ -431,14 +930,14 @@ def Messaging_Stability_Tests():
         report[2] = iterate
         report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
-        # driver = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_message_stability)
+        # driver = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_message_stability)
 
         pass_count, fail_count, test_count = 0, 0, 0
         start = datetime.datetime.now()
         while test_count < iterate:
             # Automation Code
             # send the MMS
-            driver = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_message_stability)
+            driver = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_message_stability)
             MT_contact = driver.find_element(AppiumBy.XPATH, '//android.widget.TextView[@content-desc="⁨My Jio⁩"]')
             MT_contact.click()
             time.sleep(2)
@@ -512,8 +1011,12 @@ def Messaging_Stability_Tests():
             writer(f).writerow(report)
             f.close()
 
-    mobile_originating_message_maxCharacters(2)
-    MMS_with_MAXCHAR_AUDIO(2)
+    # send_sms_maxChar()
+    # send_mms_with_audio()
+    # send_mms_with_video()
+    # send_mms_with_picture()
+    # open_sms()
+    # MMS_with_MAXCHAR_AUDIO(2)
     print('\n', "-" * 10, ">> Messaging Stability Tests Completed! <<", "-" * 10, '\n')
 
 
@@ -569,7 +1072,7 @@ def Multitasking_Stability_Test():
     print('\n', "-" * 10, ">> Multitasking Stability Test <<", "-" * 10, '\n')
 
     # Starting Appium webdriver
-    driver = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap)
+    driver = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
     if driver.is_locked():
         driver.unlock()
     driver.press_keycode(3)
@@ -698,20 +1201,20 @@ def Multimedia_Stability_Test():
         start = datetime.datetime.now()
         while test_count < iterate:
             try:
-                driver2 = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_video_camera)
+                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_video_camera)
                 time.sleep(2)
-                video_mode = driver2.find_element(AppiumBy.XPATH,
+                video_mode = driver1.find_element(AppiumBy.XPATH,
                                                   '//android.widget.SeekBar[@content-desc="Photo, Mode"]/android.view.ViewGroup[3]/android.widget.LinearLayout')
                 video_mode.click()
                 time.sleep(2)
-                capture_start = driver2.find_element(AppiumBy.ID, 'com.sec.android.app.camera:id/center_button')
+                capture_start = driver1.find_element(AppiumBy.ID, 'com.sec.android.app.camera:id/center_button')
                 capture_start.click()
                 time.sleep(30)
-                capture_stop = driver2.find_element(AppiumBy.ID, 'com.sec.android.app.camera:id/center_button')
+                capture_stop = driver1.find_element(AppiumBy.ID, 'com.sec.android.app.camera:id/center_button')
                 capture_stop.click()
-                driver2.press_keycode(4)
+                driver1.press_keycode(4)
                 pass_count += 1
-                driver2.quit()
+                driver1.quit()
                 # pass_count += 1
 
             except Exception as e:
@@ -747,21 +1250,21 @@ def Multimedia_Stability_Test():
         start = datetime.datetime.now()
         while test_count < iterate:
             try:
-                driver2 = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_video_camera)
+                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_video_camera)
                 time.sleep(2)
-                open_last_gallery = driver2.find_element(AppiumBy.XPATH,
+                open_last_gallery = driver1.find_element(AppiumBy.XPATH,
                                                          '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.RelativeLayout/android.widget.FrameLayout[3]/android.view.ViewGroup/android.view.ViewGroup/android.widget.RelativeLayout/android.widget.FrameLayout[1]/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ImageView[2]')
                 open_last_gallery.click()
                 time.sleep(2)
-                play_video = driver2.find_element(AppiumBy.XPATH,
+                play_video = driver1.find_element(AppiumBy.XPATH,
                                                   '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.RelativeLayout/android.view.ViewGroup[2]/androidx.viewpager.widget.ViewPager/android.widget.RelativeLayout/android.widget.RelativeLayout[1]/android.widget.LinearLayout/android.widget.LinearLayout')
                 play_video.click()
                 time.sleep(30)
-                driver2.press_keycode(4)
-                driver2.press_keycode(4)
+                driver1.press_keycode(4)
+                driver1.press_keycode(4)
                 pass_count += 1
 
-                driver2.quit()
+                driver1.quit()
                 # pass_count += 1
 
             except Exception as e:
@@ -797,20 +1300,20 @@ def Multimedia_Stability_Test():
         start = datetime.datetime.now()
         while test_count < iterate:
             try:
-                driver2 = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_video_camera)
+                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_video_camera)
                 time.sleep(2)
-                open_last_gallery = driver2.find_element(AppiumBy.XPATH,
+                open_last_gallery = driver1.find_element(AppiumBy.XPATH,
                                                          '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.RelativeLayout/android.widget.FrameLayout[3]/android.view.ViewGroup/android.view.ViewGroup/android.widget.RelativeLayout/android.widget.FrameLayout[1]/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ImageView[2]')
                 open_last_gallery.click()
                 time.sleep(2)
-                delete_video = driver2.find_element(AppiumBy.ACCESSIBILITY_ID, 'Delete')
+                delete_video = driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Delete')
                 delete_video.click()
                 time.sleep(2)
-                move = driver2.find_element(AppiumBy.ID, 'android:id/button1')
+                move = driver1.find_element(AppiumBy.ID, 'android:id/button1')
                 move.click()
-                driver2.press_keycode(4)
-                driver2.press_keycode(4)
-                driver2.quit()
+                driver1.press_keycode(4)
+                driver1.press_keycode(4)
+                driver1.quit()
                 pass_count += 1
 
             except Exception as e:
@@ -846,13 +1349,13 @@ def Multimedia_Stability_Test():
         start = datetime.datetime.now()
         while test_count < iterate:
             try:
-                driver2 = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_video_camera)
+                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_video_camera)
                 # front_rotate=driver2.find_element(AppiumBy.ID,'com.sec.android.app.camera:id/right_button')
                 # front_rotate.click()
-                capture_start = driver2.find_element(AppiumBy.ID, 'com.sec.android.app.camera:id/normal_overlap_image')
+                capture_start = driver1.find_element(AppiumBy.ID, 'com.sec.android.app.camera:id/normal_overlap_image')
                 capture_start.click()
                 time.sleep(5)
-                driver2.quit()
+                driver1.quit()
                 pass_count += 1
 
             except Exception as e:
@@ -888,13 +1391,13 @@ def Multimedia_Stability_Test():
         start = datetime.datetime.now()
         while test_count < iterate:
             try:
-                driver2 = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_video_camera)
+                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_video_camera)
                 time.sleep(2)
-                open_last_gallery = driver2.find_element(AppiumBy.XPATH,
+                open_last_gallery = driver1.find_element(AppiumBy.XPATH,
                                                          '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.RelativeLayout/android.widget.FrameLayout[3]/android.view.ViewGroup/android.view.ViewGroup/android.widget.RelativeLayout/android.widget.FrameLayout[1]/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ImageView[2]')
                 open_last_gallery.click()
-                driver2.press_keycode(4)
-                driver2.press_keycode(4)
+                driver1.press_keycode(4)
+                driver1.press_keycode(4)
                 pass_count += 1
 
             except Exception as e:
@@ -930,19 +1433,20 @@ def Multimedia_Stability_Test():
         start = datetime.datetime.now()
         while test_count < iterate:
             try:
-                driver2 = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_video_camera)
+                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_video_camera)
                 time.sleep(2)
-                open_last_gallery = driver2.find_element(AppiumBy.XPATH,
+                open_last_gallery = driver1.find_element(AppiumBy.XPATH,
                                                          '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.RelativeLayout/android.widget.FrameLayout[3]/android.view.ViewGroup/android.view.ViewGroup/android.widget.RelativeLayout/android.widget.FrameLayout[1]/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ImageView[2]')
                 open_last_gallery.click()
                 time.sleep(2)
-                delete_video = driver2.find_element(AppiumBy.ACCESSIBILITY_ID, 'Delete')
+                delete_video = driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Delete')
                 delete_video.click()
                 time.sleep(2)
-                move = driver2.find_element(AppiumBy.ID, 'android:id/button1')
+                move = driver1.find_element(AppiumBy.ID, 'android:id/button1')
                 move.click()
-                driver2.press_keycode(4)
-                driver2.press_keycode(4)
+                driver1.press_keycode(4)
+                driver1.press_keycode(4)
+                driver1.quit()
                 pass_count += 1
 
             except Exception as e:
@@ -978,13 +1482,13 @@ def Multimedia_Stability_Test():
         start = datetime.datetime.now()
         while test_count < iterate:
             try:
-                driver3 = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_Browser)
-                driver3.set_network_connection(6)  # Turn on Wi-Fi and mobile data
-                driver3.get("https://m.youtube.com/watch?v=Ro971vwsgPg")
-                driver3.press_keycode(66)
+                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_Browser)
+                driver1.set_network_connection(6)  # Turn on Wi-Fi and mobile data
+                driver1.get("https://m.youtube.com/watch?v=Ro971vwsgPg")
+                driver1.press_keycode(66)
                 time.sleep(15)
 
-                driver3.quit()
+                driver1.quit()
                 pass_count += 1
 
             except Exception as e:
@@ -1020,12 +1524,12 @@ def Multimedia_Stability_Test():
         start = datetime.datetime.now()
         while test_count < iterate:
             try:
-                driver4 = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_mediaplayer)
-                driver4.press_keycode(209)
+                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_mediaplayer)
+                driver1.press_keycode(209)
                 time.sleep(4)
-                driver4.press_keycode(128)
-                driver4.press_keycode(86)
-                driver4.quit()
+                driver1.press_keycode(128)
+                driver1.press_keycode(86)
+                driver1.quit()
                 pass_count += 1
 
             except Exception as e:
@@ -1061,7 +1565,7 @@ def Multimedia_Stability_Test():
         start = datetime.datetime.now()
         while test_count < iterate:
             try:
-                driver3 = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_MyFiles)
+                driver3 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_MyFiles)
                 driver3.press_keycode(209)  # open
                 driver3.press_keycode(222)  # switch track
                 driver3.press_keycode(85)  # play
@@ -1104,7 +1608,7 @@ def Multimedia_Stability_Test():
         start = datetime.datetime.now()
         while test_count < iterate:
             try:
-                driver4 = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_mediaplayer)
+                driver4 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_mediaplayer)
                 driver4.press_keycode(209)
                 time.sleep(4)
                 driver4.press_keycode(128)
@@ -1145,7 +1649,7 @@ def Multimedia_Stability_Test():
         start = datetime.datetime.now()
         while test_count < iterate:
             try:
-                driver = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_Theme)
+                driver = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_Theme)
                 time.sleep(7)
                 downloaded_theme = driver.find_element(AppiumBy.XPATH,
                                                        '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.FrameLayout/android.widget.LinearLayout/androidx.viewpager.widget.ViewPager/android.widget.FrameLayout/androidx.recyclerview.widget.RecyclerView/android.widget.FrameLayout/androidx.recyclerview.widget.RecyclerView/android.widget.FrameLayout[1]')
@@ -1204,251 +1708,6 @@ def Multimedia_Stability_Test():
     close_music_player(2)
     set_theme(2)
     print('\n', "-" * 10, ">> Multimedia Stability Test Completed! <<", "-" * 10, '\n')
-
-
-def Email_Stability_Test():
-    """
-    Email Stability Test
-    """
-    print('\n', "-" * 10, ">> Email Stability Test <<", "-" * 10, '\n')
-    report[0] = "Email Stability Test"
-    desired_cap_Email = {
-        "appium:deviceName": DEVICE1_NAME,
-        "platformName": "Android",
-        "appium:platformVersion": PLATFORM_VERSION_1,
-        "appium:appPackage": "com.google.android.gm",
-        "appium:appActivity": "com.google.android.gm.ConversationListActivityGmail",
-        "appium:adbExecTimeout": "30000",
-        "appium:automationName": "UiAutomator2",
-        "appium:uiautomator2ServerInstallTimeout": "90000",
-        "appium:noReset": "true",
-        "appium:fullReset": "false"
-    }
-
-    def send_email_no_attachment(iterate):
-        print("Event 1 : Send mail without attachment ")
-        # test report initiation
-        report[1] = 'Send mail without attachment'
-        report[2] = iterate
-        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        # loop variable initiation
-        pass_count, fail_count, test_count = 0, 0, 0
-        start = datetime.datetime.now()
-        while test_count < iterate:
-            try:
-                driver = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_Email)
-                compose_button = driver.find_element(AppiumBy.ID, 'com.google.android.gm:id/compose_button')
-                compose_button.click()
-                time.sleep(2)
-                to_cc_bcc = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Add Cc/Bcc')
-                to_cc_bcc.click()
-
-                receipent = driver.find_element(AppiumBy.XPATH,
-                                                '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.RelativeLayout/android.widget.ScrollView/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.RelativeLayout[1]/android.widget.RelativeLayout/android.widget.RelativeLayout/android.view.ViewGroup/android.widget.EditText')
-                receipent.send_keys('swarnendu0298@gmail.com')
-                driver.press_keycode(66)
-                subject = driver.find_element(AppiumBy.ID, 'com.google.android.gm:id/subject')
-                subject.send_keys('Here is my subject line!!')
-                time.sleep(2)
-                message_body = driver.find_element(AppiumBy.XPATH,
-                                                   '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.RelativeLayout/android.widget.ScrollView/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.RelativeLayout[3]/android.widget.LinearLayout/android.webkit.WebView/android.webkit.WebView/android.widget.EditText')
-                message_body.send_keys(
-                    "Hello This is my message of 30 characters. This is pre-loaded message using automation concept.//Thanks ")
-                send_email = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send')
-                send_email.click()
-                time.sleep(3)
-                # Pass or Fail
-                try:
-                    driver.find_element(AppiumBy.XPATH,
-                                        '//android.widget.LinearLayout[@content-desc="Sent"]/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.TextView[1]')
-                    pass_count += 1
-                except:
-                    fail_count += 1
-                # delete mail
-                menu = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Open navigation drawer')
-                menu.click()
-                time.sleep(2)
-                sent_mails = driver.find_element(AppiumBy.XPATH,
-                                                 '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/androidx.drawerlayout.widget.DrawerLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.support.v7.widget.RecyclerView/android.widget.LinearLayout[10]/android.widget.LinearLayout')
-                sent_mails.click()
-                time.sleep(3)
-                try:
-                    actions = TouchAction(driver)
-                    actions.tap(x=97, y=710)
-                    actions.release().perform()
-                    time.sleep(2)
-                    Delete = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Delete')
-                    Delete.click()
-                    driver.press_keycode(4)
-                    driver.quit()
-                except:
-                    print("Failed to Delete as touch sensor did not work.")
-
-            except Exception as e:
-                print(f"Iteration = {test_count}| Failed to sent Mail! | with Error : {e}")
-                fail_count += 1
-            test_count += 1
-
-        end = datetime.datetime.now()
-        # finishing test report
-        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        report[5] = str(end - start).split('.')[0]
-        report[6] = test_count
-        report[7] = pass_count
-        report[8] = fail_count
-        report[9] = round((pass_count / test_count) * 100, 2)
-        report[10] = None
-        report[11] = None
-
-        # insert test report to csv file
-        with open('automation_stability_test.csv', 'a') as f:
-            writer(f).writerow(report)
-            f.close()
-        print("\n", "Send mail without attachment automation completed!")
-
-    def send_email_with_attachment(iterate):
-        print("Event 2 : Send mail with attachment ")
-        # test report initiation
-        report[1] = 'Send mail with attachment'
-        report[2] = iterate
-        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        # loop variable initiation
-        pass_count, fail_count, test_count = 0, 0, 0
-        start = datetime.datetime.now()
-        while test_count < iterate:
-            try:
-                driver = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_Email)
-                compose_button = driver.find_element(AppiumBy.ID, 'com.google.android.gm:id/compose_button')
-                compose_button.click()
-                time.sleep(2)
-                to_cc_bcc = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Add Cc/Bcc')
-                to_cc_bcc.click()
-                receipent = driver.find_element(AppiumBy.XPATH,
-                                                '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.RelativeLayout/android.widget.ScrollView/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.RelativeLayout[1]/android.widget.RelativeLayout/android.widget.RelativeLayout/android.view.ViewGroup/android.widget.EditText')
-                receipent.send_keys("swarnendu0298@gmail.com")
-                driver.press_keycode(66)
-                subject = driver.find_element(AppiumBy.ID, 'com.google.android.gm:id/subject')
-                subject.send_keys("Here is my subject line!!")
-                time.sleep(2)
-                message_body = driver.find_element(AppiumBy.XPATH,
-                                                   '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.RelativeLayout/android.widget.ScrollView/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.RelativeLayout[3]/android.widget.LinearLayout/android.webkit.WebView/android.webkit.WebView/android.widget.EditText')
-                message_body.send_keys(
-                    "Hello This is my message of 30 characters. This is pre-loaded message using automation concept.//Thanks ")
-                time.sleep(2)
-                attachment = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Attach file')
-                attachment.click()
-                time.sleep(2)
-                attach_file = driver.find_element(AppiumBy.XPATH,
-                                                  '/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ListView/android.widget.LinearLayout[1]/android.widget.LinearLayout')
-                attach_file.click()
-                time.sleep(2)
-                doc = driver.find_element(AppiumBy.XPATH,
-                                          '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/androidx.drawerlayout.widget.DrawerLayout/android.view.ViewGroup/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ScrollView/android.widget.LinearLayout/android.widget.HorizontalScrollView/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.CompoundButton[4]')
-                doc.click()
-                time.sleep(2)
-                choose_file = driver.find_element(AppiumBy.XPATH,
-                                                  '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/androidx.drawerlayout.widget.DrawerLayout/android.view.ViewGroup/android.widget.FrameLayout/android.widget.FrameLayout[2]/android.widget.LinearLayout/android.view.ViewGroup/androidx.recyclerview.widget.RecyclerView/androidx.cardview.widget.CardView[4]/androidx.cardview.widget.CardView/android.widget.RelativeLayout/android.widget.FrameLayout[1]/android.widget.ImageView[1]')
-                choose_file.click()
-                time.sleep(2)
-                send_email = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send')
-                send_email.click()
-                time.sleep(5)
-                # Sent or Failed
-                try:
-                    driver.find_element(AppiumBy.XPATH,
-                                        '//android.widget.LinearLayout[@content-desc="Sent"]/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.TextView[1]')
-                    pass_count += 1
-                except:
-                    fail_count += 1
-                    # delete mail
-                time.sleep(2)
-                menu = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Open navigation drawer')
-                menu.click()
-                time.sleep(2)
-                sent_mails = driver.find_element(AppiumBy.XPATH,
-                                                 '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/androidx.drawerlayout.widget.DrawerLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.support.v7.widget.RecyclerView/android.widget.LinearLayout[10]/android.widget.LinearLayout')
-                sent_mails.click()
-                time.sleep(2)
-                try:
-                    actions = TouchAction(driver)
-                    actions.tap(x=97, y=710)
-                    actions.release().perform()
-                    time.sleep(2)
-                    Delete = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Delete')
-                    Delete.click()
-                    time.sleep(3)
-                    driver.press_keycode(4)
-                    driver.quit()
-                    # driver.press_keycode(4)
-                except:
-                    print("Failed to Delete as touch sensor did not work.")
-            except Exception as e:
-                print(f"Iteration = {test_count}| Failed to sent Mail! | with Error : {e}")
-            test_count += 1
-
-        end = datetime.datetime.now()
-        # finishing test report
-        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        report[5] = str(end - start).split('.')[0]
-        report[6] = test_count
-        report[7] = pass_count
-        report[8] = fail_count
-        report[9] = round((pass_count / test_count) * 100, 2)
-        report[10] = None
-        report[11] = None
-
-        # insert test report to csv file
-        with open('automation_stability_test.csv', 'a') as f:
-            writer(f).writerow(report)
-            f.close()
-        print("\n", "Send mail with attachment automation completed!")
-
-    def open_email(iterate):
-        print("Event 3 : Open mail ")
-        # test report initiation
-        report[1] = 'Open mail'
-        report[2] = iterate
-        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        # loop variable initiation
-        pass_count, fail_count, test_count = 0, 0, 0
-        start = datetime.datetime.now()
-        while test_count < iterate:
-            try:
-                driver = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_Email)
-                time.sleep(2)
-                actions = TouchAction(driver)
-                actions.tap(x=399, y=626)
-                actions.release().perform()
-                time.sleep(3)
-                pass_count += 1
-                driver.quit()
-
-            except Exception as e:
-                print(f"Iteration = {test_count}| Failed to sent Mail! | with Error : {e}")
-                fail_count += 1
-            test_count += 1
-
-        end = datetime.datetime.now()
-        # finishing test report
-        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        report[5] = str(end - start).split('.')[0]
-        report[6] = test_count
-        report[7] = pass_count
-        report[8] = fail_count
-        report[9] = round((pass_count / test_count) * 100, 2)
-        report[10] = None
-        report[11] = None
-
-        # insert test report to csv file
-        with open('automation_stability_test.csv', 'a') as f:
-            writer(f).writerow(report)
-            f.close()
-        print("\n", "Open Mail automation completed!")
-
-    send_email_no_attachment(2)
-    send_email_with_attachment(2)
-    open_email(2)
-    print('\n', "-" * 10, ">> Email Stability Test Completed! <<", "-" * 10, '\n')
 
 
 def Menu_Navigation_Stability_Test():
@@ -1520,7 +1779,7 @@ def Browser_Stability_Test():
         start = datetime.datetime.now()
         while test_count < iterate:
             try:
-                driver3 = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_Browser)
+                driver3 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_Browser)
                 driver3.set_network_connection(6)  # Turn on wifi and mobile data
                 driver3.get("https://www.att.com")
                 # driver3.press_keycode(66)
@@ -1561,7 +1820,7 @@ def Browser_Stability_Test():
         start = datetime.datetime.now()
         while test_count < iterate:
             try:
-                driver3 = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_Browser)
+                driver3 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_Browser)
                 driver3.set_network_connection(6)
                 # Turn on wifi and mobile data
                 # time.sleep(2)
@@ -1614,7 +1873,7 @@ def Browser_Stability_Test():
         start = datetime.datetime.now()
         while test_count < iterate:
             try:
-                driver3 = webdriver.Remote("http://localhost:4723/wd/hub", desired_cap_Browser)
+                driver3 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_Browser)
                 driver3.set_network_connection(6)  # Turn on wifi and mobile data
                 driver3.get("https://www.cricketwireless.com")
                 time.sleep(4)
@@ -1653,6 +1912,243 @@ def Browser_Stability_Test():
     navigte_link_to_link_ATT_homepage(2)
     top_websites(2)
     print('\n', "-" * 10, ">> Browser Stability Test Completed! <<", "-" * 10, '\n')
+
+
+def Email_Stability_Test():
+    """
+    Email Stability Test
+    """
+    print('\n', "-" * 10, ">> Email Stability Test <<", "-" * 10, '\n')
+    report[0] = "Email Stability Test"
+
+    def send_email_no_attachment(iterate=40):
+        print("Event 1 : Send mail without attachment ")
+        # test report initiation
+        report[1] = 'Send mail without attachment'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        # loop variable initiation
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+                driver1.press_keycode(3)
+                driver1.set_network_connection(6)  # turn on both, WiFi & Cellular Data
+                time.sleep(3)
+                driver1.activate_app(GMAIL_APP_PACKAGE)
+                time.sleep(2)
+                driver1.find_element(AppiumBy.ID, 'com.google.android.gm:id/compose_button').click()
+                time.sleep(2)
+                driver1.find_element(AppiumBy.XPATH,
+                                     "/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.RelativeLayout/android.widget.ScrollView/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.RelativeLayout[1]/android.widget.RelativeLayout/android.widget.RelativeLayout/android.view.ViewGroup/android.widget.EditText").send_keys(
+                    'swarnendu0298@gmail.com')
+                driver1.press_keycode(66)
+                time.sleep(2)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.EditText"):
+                    if i.text == "Subject":
+                        i.send_keys("Here is my subject line!!")
+                    if i.text == "Compose email":
+                        i.send_keys("Hello This is my message of 30 characters. This is pre-loaded message using "
+                                    "automation concept.//Thanks ")
+
+                time.sleep(2)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send').click()
+                time.sleep(3)
+                # Pass or Fail & delete mail
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Open navigation drawer').click()
+                time.sleep(2)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "Sent":
+                        i.click()
+                        break
+                time.sleep(2)
+                try:
+                    for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                        if i.text == "Here is my subject line!!":
+                            pass_count += 1
+                            i.click()
+                            driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Delete').click()
+                            break
+                    time.sleep(2)
+                    driver1.press_keycode(4)
+                    driver1.press_keycode(3)
+                    driver1.quit()
+                except:
+                    print("Failed to Delete as touch sensor did not work.")
+                    fail_count += 1
+
+            except Exception as e:
+                print(f"Iteration = {test_count}| Failed to sent Mail! | with Error : {e}")
+                fail_count += 1
+            test_count += 1
+
+        end = datetime.datetime.now()
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Send mail without attachment automation completed!")
+
+    def send_email_with_attachment(iterate=40):
+        print("Event 2 : Send mail with attachment ")
+        # test report initiation
+        report[1] = 'Send mail with attachment'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        # loop variable initiation
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+                driver1.press_keycode(3)
+                driver1.set_network_connection(6)  # turn on both, WiFi & Cellular Data
+                time.sleep(3)
+                driver1.activate_app(GMAIL_APP_PACKAGE)
+                time.sleep(2)
+                compose_button = driver1.find_element(AppiumBy.ID, 'com.google.android.gm:id/compose_button')
+                compose_button.click()
+                time.sleep(2)
+                to_cc_bcc = driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Add Cc/Bcc')
+                to_cc_bcc.click()
+                receipent = driver1.find_element(AppiumBy.XPATH,
+                                                 '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.RelativeLayout/android.widget.ScrollView/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.RelativeLayout[1]/android.widget.RelativeLayout/android.widget.RelativeLayout/android.view.ViewGroup/android.widget.EditText')
+                receipent.send_keys("swarnendu0298@gmail.com")
+                driver1.press_keycode(66)
+                subject = driver1.find_element(AppiumBy.ID, 'com.google.android.gm:id/subject')
+                subject.send_keys("Here is my subject line!!")
+                time.sleep(2)
+                message_body = driver1.find_element(AppiumBy.XPATH,
+                                                    '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.RelativeLayout/android.widget.ScrollView/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.RelativeLayout[3]/android.widget.LinearLayout/android.webkit.WebView/android.webkit.WebView/android.widget.EditText')
+                message_body.send_keys(
+                    "Hello This is my message of 30 characters. This is pre-loaded message using automation concept.//Thanks ")
+                time.sleep(2)
+                attachment = driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Attach file')
+                attachment.click()
+                time.sleep(2)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "Attach file":
+                        i.click()
+                        break
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Show roots").click()
+                time.sleep(1)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "Downloads":
+                        i.click()
+                        break
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "sample-pdf-file.pdf":
+                        i.click()
+                        break
+                time.sleep(2)
+                send_email = driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send')
+                send_email.click()
+                time.sleep(5)
+                # Pass or Fail & delete mail
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Open navigation drawer').click()
+                time.sleep(2)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "Sent":
+                        i.click()
+                        break
+                time.sleep(2)
+                try:
+                    for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                        if i.text == "Here is my subject line!!":
+                            pass_count += 1
+                            i.click()
+                            driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Delete').click()
+                            break
+                    time.sleep(2)
+                    driver1.press_keycode(4)
+                    driver1.press_keycode(3)
+                    driver1.quit()
+                except:
+                    print("Failed to Delete as touch sensor did not work.")
+            except Exception as e:
+                print(f"Iteration = {test_count}| Failed to sent Mail! | with Error : {e}")
+            test_count += 1
+
+        end = datetime.datetime.now()
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Send mail with attachment automation completed!")
+
+    def open_email(iterate=40):
+        print("Event 3 : Open mail ")
+        # test report initiation
+        report[1] = 'Open mail'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        # loop variable initiation
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+                driver1.press_keycode(3)
+                driver1.set_network_connection(6)  # turn on both, WiFi & Cellular Data
+                time.sleep(4)
+                driver1.activate_app(GMAIL_APP_PACKAGE)
+                time.sleep(2)
+                # actions = TouchAction(driver1)
+                # actions.tap(x=399, y=626)
+                # actions.release().perform()
+                # time.sleep(3)
+                pass_count += 1
+                driver1.terminate_app(GMAIL_APP_PACKAGE)
+                driver1.set_network_connection(0)
+                driver1.quit()
+
+            except Exception as e:
+                print(f"Iteration = {test_count}| Failed to sent Mail! | with Error : {e}")
+                fail_count += 1
+            test_count += 1
+
+        end = datetime.datetime.now()
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Open Mail automation completed!")
+
+    # send_email_no_attachment()
+    # send_email_with_attachment()
+    open_email(2)
+    print('\n', "-" * 10, ">> Email Stability Test Completed! <<", "-" * 10, '\n')
 
 
 def Telephony_Stability_Test():
@@ -3834,7 +4330,7 @@ def IPME_Wave2_stability_test():
     file_transfer_wifi()
 
 
-# Messaging_Stability_Tests()
+Messaging_Stability_Tests()
 # Email_Stability_Test()
 # Browser_Stability_Test()
 # Multimedia_Stability_Test()
@@ -3845,5 +4341,5 @@ def IPME_Wave2_stability_test():
 # Video_Telephony_Stability_Test()
 # wifi_calling_stability_test()
 # PIM_stability_test()
-IPME_Wave1_stability_test()
-IPME_Wave2_stability_test()
+# IPME_Wave1_stability_test()
+# IPME_Wave2_stability_test()

@@ -15,6 +15,7 @@ PLAYSTORE_APP_PACKAGE = "com.android.vending"
 PLAYSTORE_APP_ACTIVITY = "com.google.android.finsky.activities.MainActivity"
 CAMERA_APP_PACKAGE = "com.huawei.camera"
 CHROME_APP_PACKAGE = "com.android.chrome"
+GMAIL_APP_PACKAGE = "com.google.android.gm"
 BG_APPS = [CONTACTS_APP_PACKAGE, MSG_APP_PACKAGE, CAMERA_APP_PACKAGE, CHROME_APP_PACKAGE, PLAYSTORE_APP_PACKAGE]
 
 PH_NUMBER_1 = "7029972335"
@@ -22,7 +23,12 @@ PH_NUMBER_2 = "9614929765"
 CALL_DURATION = 5
 # Type the body of your message here.
 MSG_TEXT = "Nam quis nulla. Integer malesuada. In in enim a arcu imperdiet malesuada. Sed vel lectus. Donec odio urna, tempus molestie, porttitor ut, iaculis quis, sem. Phasellus rhoncus. Aenean id metus id velit"
-APP_NAME = "Google Tasks"  # Complete name of the app available in PlayStore(** Case Sensitive)
+# Complete name of the app available in PlayStore(** Case Sensitive)
+APP_NAME = "Google Tasks"
+# Download Links
+AUDIO_FILE_LINK = "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_1MG.mp3"
+VIDEO_FILE_LINK = "https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_480_1_5MG.mp4"
+PICTURE_FILE_LINK = "https://file-examples.com/wp-content/uploads/2017/10/file_example_JPG_1MB.jpg"
 
 # desired capabilities dictionary
 desired_cap = {
@@ -61,7 +67,7 @@ def create_contact(driver, n=50):
         [i.send_keys(f"test{itr}") for i in driver.find_elements(AppiumBy.CLASS_NAME, "android.widget.EditText") if
          i.text == "First name"]
         time.sleep(1)
-        [i.send_keys(PH_NUMBER) for i in driver.find_elements(AppiumBy.CLASS_NAME, "android.widget.EditText") if
+        [i.send_keys(PH_NUMBER_2) for i in driver.find_elements(AppiumBy.CLASS_NAME, "android.widget.EditText") if
          i.text == "Phone"]
         time.sleep(1)
         driver.find_element(AppiumBy.ID, "com.google.android.contacts:id/menu_save").click()
