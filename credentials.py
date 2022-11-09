@@ -19,7 +19,7 @@ BG_APPS = [CONTACTS_APP_PACKAGE, MSG_APP_PACKAGE, CAMERA_APP_PACKAGE, CHROME_APP
 
 PH_NUMBER = "9614929765"  # "7029972335"
 CALL_DURATION = 5
-APP_NAME = "Sudoku offline"  # Complete name of the app available in PlayStore(** Case Sensitive)
+APP_NAME = "Google Tasks"  # Complete name of the app available in PlayStore(** Case Sensitive)
 
 # desired capabilities dictionary
 desired_cap = {

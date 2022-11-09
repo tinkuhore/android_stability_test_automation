@@ -2712,6 +2712,314 @@ def wifi_calling_stability_test():
     wifi_call_from_phone_book(3)
     wifi_make_call_from_dialer(3)
     receive_a_wifi_call(3)
+    print('\n', "-" * 10, ">> WiFi Calling WFC Stability Test Completed! <<", "-" * 10, '\n')
+
+def PIM_stability_test():
+    """
+    PIM Stability Test
+    """
+    print('\n', "-" * 10, ">> PIM Stability Test <<", "-" * 10, '\n')
+    report[0] = "PIM Stability Test"
+    driver = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+
+    def make_an_appointment_calender(iterate=5):
+        print('\n', "Event 1 : Add an appointment to the Calender ")
+        # test report initiation
+        report[1] = 'Add an appointment to the Calender'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        # loop variable initiation
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                driver.press_keycode(3)
+                driver.activate_app('com.google.android.calendar')
+                time.sleep(2)
+                driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Create new event and more').click()
+                time.sleep(2)
+                driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Task button').click()
+                driver.find_element(AppiumBy.ID, 'com.google.android.calendar:id/title').send_keys(
+                    "Dentist Appointment")
+
+                # enter todays date in below format
+                today_date = driver.find_element(AppiumBy.ACCESSIBILITY_ID,
+                                                 f'Start date: {datetime.datetime.today().strftime("%a, %-d %b %Y")}')
+                today_date.click()
+                time.sleep(2)
+                # enter appointment date in below format
+                driver.find_element(AppiumBy.ACCESSIBILITY_ID, '12 November 2022').click()
+                time.sleep(2)
+                driver.find_element(AppiumBy.ID, 'android:id/button1').click()
+                time.sleep(1)
+                driver.find_element(AppiumBy.ID, 'com.google.android.calendar:id/save').click()
+                time.sleep(1)
+                driver.terminate_app('com.google.android.calendar')
+                driver.press_keycode(3)
+                pass_count+=1
+            except Exception as e:
+                fail_count+=1
+                print(f"Iteration = {test_count + 1}| Failed to Add an appointment to the Calender! | with Error : {e}")
+            test_count += 1
+
+        end = datetime.datetime.now()
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 1 completed!")
+
+    '''
+    Need to install google task from playstore
+    '''
+
+    def delete_an_appointment_calender(iterate=5):
+        print('\n', "Event 2 : Delete an appointment in the Calender ")
+        # test report initiation
+        report[1] = 'Delete an appointment in the Calender'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        # loop variable initiation
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                driver.press_keycode(3)
+                driver.activate_app('com.google.android.apps.tasks')
+                time.sleep(2)
+                driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'My Tasks').click()
+                for i in driver.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "Dentist Appointment":
+                        i.click()
+                        break
+                time.sleep(1)
+                driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Delete').click()
+                driver.terminate_app('com.google.android.apps.tasks')
+                pass_count+=1
+            except Exception as e:
+                print(f"Iteration = {test_count + 1}| Failed to Delete an appointment in the Calender! | with Error : {e}")
+                fail_count+=1
+            test_count += 1
+
+        end = datetime.datetime.now()
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 2 completed!")
+
+    def set_alarm(iterate=1):
+        print('\n', "Event 3 : Set an Alarm ")
+        # test report initiation
+        report[1] = 'Set an Alarm'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        # loop variable initiation
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                driver.activate_app('com.google.android.deskclock')
+                time.sleep(2)
+                driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Alarm').click()
+                driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Add alarm').click()
+                time.sleep(2)
+                driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Switch to text input mode for the time input.').click()
+                time.sleep(1)
+                driver.find_element(AppiumBy.ID, 'android:id/input_hour').send_keys("22")
+                driver.find_element(AppiumBy.ID, 'android:id/input_minute').send_keys("24")
+                driver.find_element(AppiumBy.ID, 'android:id/button1').click()
+                driver.terminate_app('com.google.android.deskclock')
+                pass_count += 1
+            except Exception as e:
+                print(f"Iteration = {test_count + 1}| Failed to Set an Alarm! | with Error : {e}")
+                fail_count += 1
+            test_count += 1
+
+        end = datetime.datetime.now()
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 3 completed!")
+
+    def delete_alarm(iterate=1):
+        print('\n', "Event 4 : Delete an Alarm ")
+        # test report initiation
+        report[1] = 'Delete an Alarm'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        # loop variable initiation
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                driver.activate_app('com.google.android.deskclock')
+                time.sleep(2)
+                driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Alarm').click()
+                driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Expand alarm').click()
+                driver.find_element(AppiumBy.ID, 'com.google.android.deskclock:id/delete').click()
+                driver.terminate_app('com.google.android.deskclock')
+                pass_count += 1
+            except Exception as e:
+                print(f"Iteration = {test_count + 1}| Failed to Delete an Alarm! | with Error : {e}")
+                fail_count += 1
+            test_count += 1
+
+        end = datetime.datetime.now()
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 4 completed!")
+
+
+    def add_contact_phonebook(iterate=20):
+        print('\n', "Event 5 : Add Contact to the Phone Book ")
+        # test report initiation
+        report[1] = 'Add Contact to the Phone Book'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        # loop variable initiation
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                driver.activate_app('com.google.android.contacts')
+                time.sleep(2)
+                driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Create contact').click()
+                time.sleep(2)
+                driver.find_element(AppiumBy.XPATH,
+                                    '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.ScrollView/android.widget.LinearLayout/android.view.ViewGroup/android.widget.LinearLayout[3]/android.widget.LinearLayout/android.widget.LinearLayout[1]/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.LinearLayout[1]/android.widget.FrameLayout/android.widget.EditText').send_keys(
+                    "Test")
+                driver.find_element(AppiumBy.XPATH,
+                                    '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.ScrollView/android.widget.LinearLayout/android.view.ViewGroup/android.widget.LinearLayout[3]/android.widget.LinearLayout/android.widget.LinearLayout[3]/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.LinearLayout/android.widget.LinearLayout[1]/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.EditText').send_keys(
+                    "12345678")
+                driver.find_element(AppiumBy.ID, 'com.google.android.contacts:id/toolbar_button').click()
+                driver.terminate_app('com.google.android.contacts')
+                pass_count += 1
+            except Exception as e:
+                print(f"Iteration = {test_count + 1}| Failed to Add Contact to the Phone Book! | with Error : {e}")
+                fail_count += 1
+            test_count += 1
+
+        end = datetime.datetime.now()
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 5 completed!")
+
+
+    def delete_contact_phonebook(iterate=20):
+        print('\n', "Event 6 : Delete Contact from the Phone Book ")
+        # test report initiation
+        report[1] = 'Delete Contact from the Phone Book'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        # loop variable initiation
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                driver.activate_app('com.google.android.contacts')
+                time.sleep(2)
+                driver.find_element(AppiumBy.ID, 'com.google.android.contacts:id/open_search_bar').click()
+                time.sleep(2)
+                driver.press_keycode(48)
+                driver.press_keycode(33)
+                driver.press_keycode(47)
+                driver.press_keycode(48)
+                # below line is error
+                # driver3.find_element(AppiumBy.ID,'com.google.android.contacts:id/open_search_bar_text_view').send_keys("Test")
+                driver.find_element(AppiumBy.ID, 'com.google.android.contacts:id/alert_text').click()
+                driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'More options').click()
+                time.sleep(2)
+                driver.find_element(AppiumBy.XPATH,
+                                    '/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.ListView/android.widget.LinearLayout[1]/android.widget.LinearLayout').click()
+                driver.find_element(AppiumBy.ID, 'android:id/button1').click()
+                driver.terminate_app('com.google.android.contacts')
+                pass_count += 1
+            except Exception as e:
+                print(f"Iteration = {test_count + 1}| Failed to Delete Contact from the Phone Book! | with Error : {e}")
+                fail_count += 1
+            test_count += 1
+
+        end = datetime.datetime.now()
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 6 completed!")
+
+    make_an_appointment_calender()
+    delete_an_appointment_calender()
+    set_alarm()
+    delete_alarm()
+    add_contact_phonebook()
+    delete_contact_phonebook()
+    print('\n', "-" * 10, ">> PIM Stability Test Completed! <<", "-" * 10, '\n')
+
 
 
 # Messaging_Stability_Tests()
@@ -2723,4 +3031,5 @@ def wifi_calling_stability_test():
 # playstore_test()
 # Telephony_Stability_Test()
 # Video_Telephony_Stability_Test()
-wifi_calling_stability_test()
+# wifi_calling_stability_test()
+# PIM_stability_test()
