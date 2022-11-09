@@ -8,8 +8,8 @@ PLATFORM_VERSION_1 = "11"
 DEVICE2_NAME = "PT99652CA1AC0700134"
 PLATFORM_VERSION_2 = "11"
 # different app packages
-DIALER_APP_PACKAGE = 'com.google.android.dialer' # or "com.android.phone"
-MSG_APP_PACKAGE = "com.android.mms"
+DIALER_APP_PACKAGE = 'com.google.android.dialer'  # or "com.android.phone"
+MSG_APP_PACKAGE = "com.google.android.apps.messaging"
 CONTACTS_APP_PACKAGE = "com.google.android.contacts"
 PLAYSTORE_APP_PACKAGE = "com.android.vending"
 PLAYSTORE_APP_ACTIVITY = "com.google.android.finsky.activities.MainActivity"
@@ -17,8 +17,11 @@ CAMERA_APP_PACKAGE = "com.huawei.camera"
 CHROME_APP_PACKAGE = "com.android.chrome"
 BG_APPS = [CONTACTS_APP_PACKAGE, MSG_APP_PACKAGE, CAMERA_APP_PACKAGE, CHROME_APP_PACKAGE, PLAYSTORE_APP_PACKAGE]
 
-PH_NUMBER = "9614929765"  # "7029972335"
+PH_NUMBER_1 = "7029972335"
+PH_NUMBER_2 = "9614929765"
 CALL_DURATION = 5
+# Type the body of your message here.
+MSG_TEXT = "Nam quis nulla. Integer malesuada. In in enim a arcu imperdiet malesuada. Sed vel lectus. Donec odio urna, tempus molestie, porttitor ut, iaculis quis, sem. Phasellus rhoncus. Aenean id metus id velit"
 APP_NAME = "Google Tasks"  # Complete name of the app available in PlayStore(** Case Sensitive)
 
 # desired capabilities dictionary
@@ -65,6 +68,7 @@ def create_contact(driver, n=50):
         driver.press_keycode(3)
         itr += 1
 
+
 def contacts():
     # contact list
     contacts = subprocess.check_output(
@@ -73,3 +77,52 @@ def contacts():
     l = str(contacts).split("Row:")
     count = len([i for i in l if i.split("=")[-1][:4] == 'test'])
     return count
+
+
+def enable_chat_feature(driver):
+    driver.press_keycode(3)
+    driver.activate_app(MSG_APP_PACKAGE)
+    time.sleep(2)
+    driver.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/og_apd_internal_image_view").click()
+    time.sleep(1)
+    for i in driver.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+        if i.text == "Messages settings":
+            i.click()
+            break
+    time.sleep(1)
+    for i in driver.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+        if i.text == "Chat features":
+            i.click()
+            break
+    time.sleep(1)
+    if driver.find_element(AppiumBy.CLASS_NAME, "android.widget.Switch").get_attribute("checked") == "false":
+        driver.find_element(AppiumBy.CLASS_NAME, "android.widget.Switch").click()
+    time.sleep(2)
+    driver.press_keycode(4)
+    driver.press_keycode(4)
+    driver.press_keycode(3)
+
+def disable_chat_feature(driver):
+    driver.press_keycode(3)
+    driver.activate_app(MSG_APP_PACKAGE)
+    time.sleep(2)
+    driver.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/og_apd_internal_image_view").click()
+    time.sleep(1)
+    for i in driver.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+        if i.text == "Messages settings":
+            i.click()
+            break
+    time.sleep(1)
+    for i in driver.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+        if i.text == "Chat features":
+            i.click()
+            break
+    time.sleep(1)
+    if driver.find_element(AppiumBy.CLASS_NAME, "android.widget.Switch").get_attribute("checked") == "true":
+        driver.find_element(AppiumBy.CLASS_NAME, "android.widget.Switch").click()
+        time.sleep(1)
+        driver.find_element(AppiumBy.ID, "android:id/button1").click()
+    time.sleep(2)
+    driver.press_keycode(4)
+    driver.press_keycode(4)
+    driver.press_keycode(3)
