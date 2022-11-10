@@ -1,6 +1,8 @@
 # constant parameters
 import subprocess
 import time
+
+from appium import webdriver
 from appium.webdriver.common.appiumby import AppiumBy
 
 DEVICE1_NAME = "PT99653CA1AC1800106"
@@ -26,9 +28,13 @@ MSG_TEXT = "Nam quis nulla. Integer malesuada. In in enim a arcu imperdiet males
 # Complete name of the app available in PlayStore(** Case Sensitive)
 APP_NAME = "Google Tasks"
 # Download Links
+## 1MB files
 AUDIO_FILE_LINK = "https://file-examples.com/wp-content/uploads/2017/11/file_example_MP3_1MG.mp3"
 VIDEO_FILE_LINK = "https://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_480_1_5MG.mp4"
 PICTURE_FILE_LINK = "https://file-examples.com/wp-content/uploads/2017/10/file_example_JPG_1MB.jpg"
+
+## 10 MB files
+
 
 # desired capabilities dictionary
 desired_cap = {
@@ -101,12 +107,23 @@ def enable_chat_feature(driver):
             i.click()
             break
     time.sleep(1)
+    flag = False
     if driver.find_element(AppiumBy.CLASS_NAME, "android.widget.Switch").get_attribute("checked") == "false":
         driver.find_element(AppiumBy.CLASS_NAME, "android.widget.Switch").click()
+        time.sleep(10)
+    for i in driver.find_elements(AppiumBy.CLASS_NAME, 'android.widget.TextView'):
+        if 'Status' in i.text:
+            print("Chat Feature -->> ", i.text)
+            if i.text.split(' ')[1] == 'Connected':
+                flag = True
+            else:
+                print("You are requested to Verify & Connect Chat Feature.")
+
     time.sleep(2)
     driver.press_keycode(4)
     driver.press_keycode(4)
-    driver.press_keycode(3)
+    return flag
+
 
 def disable_chat_feature(driver):
     driver.press_keycode(3)
@@ -128,7 +145,10 @@ def disable_chat_feature(driver):
         driver.find_element(AppiumBy.CLASS_NAME, "android.widget.Switch").click()
         time.sleep(1)
         driver.find_element(AppiumBy.ID, "android:id/button1").click()
+    print("Chat Feature -->> Disabled")
     time.sleep(2)
     driver.press_keycode(4)
     driver.press_keycode(4)
-    driver.press_keycode(3)
+    return True
+
+

@@ -322,704 +322,6 @@ def playstore_test():
     event3(2)
 
 
-def Messaging_Stability_Tests():
-    """
-    Messaging Stability Tests
-    1.Send an SMS maximum number of characters without requiring the message to be segmented from the DUT (50)
-    2.Send a MMS with an audio attachment from the device under test (50)
-    3.Send a MMS with a video attachment from the device under test (50)
-    4.Send a MMS with a picture attachment from the device under test (50)
-    5.Open a MMS with a 1MB audio attachment or largest size supported by the device (50)
-    6.Open a MMS with 1MB video or largest size supported by the device (50)
-    7.Open a MMS with a 1MB image or largest size supported by the device (50)
-    8.Open a SMS (50)
-    """
-    print('\n', "-" * 10, ">> Messaging Stability Tests <<", "-" * 10, '\n')
-    report[0] = 'Messaging Stability Test'
-
-    def send_sms_maxChar(iterate=20):
-        """This function Automatically test the SMS service of the Messaging app."""
-        print('\n', "Event 1 : Add an appointment to the Calender ")
-        # test report initiation
-        report[
-            1] = 'Send an SMS maximum number of characters with out requiring the message to be segmented from the DUT.'
-        report[2] = iterate
-        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
-        pass_count, fail_count, test_count = 0, 0, 0
-        start = datetime.datetime.now()
-        while test_count < iterate:
-            try:
-                # Automation Code
-                # send the message
-                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
-                driver1.activate_app(MSG_APP_PACKAGE)
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
-                    PH_NUMBER_2)
-                driver1.press_keycode(66)
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ID,
-                                     'com.google.android.apps.messaging:id/compose_message_text').send_keys(
-                    '1234567890@#$%^&*()qwertyuiop[]sdfghjkl;qwertyuiopasdfghjklzxcvbnm,./;12345678901234567890!@#$%^&*('
-                    ')qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfgjklzxcvbnm1234567890qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm12345678901!@#$%^&*()_+asdfghjklqwertyuopzxcvbnm')
-
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send SMS').click()
-                time.sleep(4)
-
-                # SENT or FAILED
-                try:
-                    if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Now, SMS').is_enabled():
-                        pass_count += 1
-                except:
-                    fail_count += 1
-
-                # Delete the message
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'More conversation options').click()
-                time.sleep(1)
-                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    if i.text == "Delete":
-                        i.click()
-                        break
-                driver1.find_element(AppiumBy.ID, "android:id/button1").click()
-                time.sleep(2)
-                test_count += 1
-                driver1.press_keycode(4)
-                driver1.quit()
-            except Exception as e:
-                fail_count += 1
-                print(f"Iteration = {test_count + 1}| Failed to Send an SMS! | with Error : {e}")
-            test_count += 1
-        end = datetime.datetime.now()
-        # driver.quit()
-
-        # finishing test report
-        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        report[5] = str(end - start).split('.')[0]
-        report[6] = test_count
-        report[7] = pass_count
-        report[8] = fail_count
-        report[9] = round((pass_count / test_count) * 100, 2)
-        report[10] = None
-        report[11] = None
-
-        # insert test report to csv file
-        with open('automation_stability_test.csv', 'a') as f:
-            writer(f).writerow(report)
-            f.close()
-        print("\n", "Event 1 completed!")
-
-    def send_mms_with_audio(iterate=20):
-        """This function Automatically test the MMS (Audio) service of the Messaging app."""
-        print('\n', "Event 2 : Send a MMS with an audio attachment")
-        # test report initiation
-        report[1] = 'Send a MMS with an audio attachment'
-        report[2] = iterate
-        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
-        pass_count, fail_count, test_count = 0, 0, 0
-        start = datetime.datetime.now()
-        while test_count < iterate:
-            try:
-                # Automation Code
-                # send the MMS
-                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
-                driver1.activate_app(MSG_APP_PACKAGE)
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
-                    PH_NUMBER_2)
-                driver1.press_keycode(66)
-                time.sleep(2)
-                # attatchment section
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Add files, location and more").click()
-                time.sleep(1)
-                driver1.find_element(AppiumBy.XPATH,
-                                     '//android.view.ViewGroup[@content-desc="Files"]/android.widget.ImageView').click()
-                time.sleep(2)
-                # file selection
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Show roots").click()
-                time.sleep(2)
-                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView")[1:]:
-                    print(i.text)
-                    if i.text == "Downloads":
-                        i.click()
-                        break
-                try:
-                    driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "List View").click()
-                except:
-                    print("List View Enabled")
-
-                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    if i.text == "file_example_MP3_1MG.mp3":
-                        print(i.text)
-                        i.click()
-                        break
-                time.sleep(5)
-                driver1.find_element(AppiumBy.ID,
-                                     'com.google.android.apps.messaging:id/compose_message_text').send_keys(
-                    "1234567890@#$%^&*()qwertyuiop[]sdfghjkl;qwertyuiopasdfghjklzxcvbnm,"
-                    "./;12345678901234567890!@#$%^&*(")
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send SMS').click()
-                time.sleep(4)
-
-                # SENT or FAILED
-                try:
-                    if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Now, SMS').is_enabled():
-                        pass_count += 1
-                except:
-                    fail_count += 1
-
-                # Delete the message
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'More conversation options').click()
-                time.sleep(1)
-                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    if i.text == "Delete":
-                        i.click()
-                        break
-                driver1.find_element(AppiumBy.ID, "android:id/button1").click()
-                time.sleep(2)
-                test_count += 1
-                driver1.press_keycode(4)
-                driver1.quit()
-            except Exception as e:
-                fail_count += 1
-                print(
-                    f"Iteration = {test_count + 1}| Failed to 'Send a MMS with an audio attachment'! | with Error : {e}")
-            test_count += 1
-        end = datetime.datetime.now()
-        # driver.quit()
-
-        # finishing test report
-        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        report[5] = str(end - start).split('.')[0]
-        report[6] = test_count
-        report[7] = pass_count
-        report[8] = fail_count
-        report[9] = round((pass_count / test_count) * 100, 2)
-        report[10] = None
-        report[11] = None
-
-        # insert test report to csv file
-        with open('automation_stability_test.csv', 'a') as f:
-            writer(f).writerow(report)
-            f.close()
-        print("\n", "Event 2 completed!")
-
-    def send_mms_with_video(iterate=20):
-        """This function Automatically test the MMS (Video) service of the Messaging app."""
-        print('\n', "Event 3 : Send a MMS with a video attachment")
-        # test report initiation
-        report[1] = 'Send a MMS with a video attachment'
-        report[2] = iterate
-        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
-        pass_count, fail_count, test_count = 0, 0, 0
-        start = datetime.datetime.now()
-        while test_count < iterate:
-            try:
-                # Automation Code
-                # send the MMS
-                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
-                driver1.activate_app(MSG_APP_PACKAGE)
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
-                    PH_NUMBER_2)
-                driver1.press_keycode(66)
-                time.sleep(2)
-                # attatchment section
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Add files, location and more").click()
-                time.sleep(1)
-                driver1.find_element(AppiumBy.XPATH,
-                                     '//android.view.ViewGroup[@content-desc="Files"]/android.widget.ImageView').click()
-                time.sleep(2)
-                # file selection
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Show roots").click()
-                time.sleep(3)
-                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    print(i.text)
-                    if i.text == "Downloads":
-                        i.click()
-                        break
-                # try:
-                #     driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "List View").click()
-                # except:
-                #     print("List View Enabled")
-                time.sleep(3)
-                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    if i.text == "file_example_MP4_480_1_5MG.mp4":
-                        print(i.text)
-                        i.click()
-                        break
-                time.sleep(5)
-                driver1.find_element(AppiumBy.ID,
-                                     'com.google.android.apps.messaging:id/compose_message_text').send_keys(
-                    "1234567890@#$%^&*()qwertyuiop[]sdfghjkl;qwertyuiopasdfghjklzxcvbnm,"
-                    "./;12345678901234567890!@#$%^&*(")
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send SMS').click()
-                time.sleep(4)
-
-                # SENT or FAILED
-                try:
-                    if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Now, SMS').is_enabled():
-                        pass_count += 1
-                except:
-                    fail_count += 1
-
-                # Delete the message
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'More conversation options').click()
-                time.sleep(1)
-                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    if i.text == "Delete":
-                        i.click()
-                        break
-                driver1.find_element(AppiumBy.ID, "android:id/button1").click()
-                time.sleep(2)
-                test_count += 1
-                driver1.press_keycode(4)
-                driver1.quit()
-            except Exception as e:
-                fail_count += 1
-                print(f"Iteration = {test_count + 1}| Failed to Send a MMS with a video attachment! | with Error : {e}")
-            test_count += 1
-        end = datetime.datetime.now()
-        # driver.quit()
-
-        # finishing test report
-        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        report[5] = str(end - start).split('.')[0]
-        report[6] = test_count
-        report[7] = pass_count
-        report[8] = fail_count
-        report[9] = round((pass_count / test_count) * 100, 2)
-        report[10] = None
-        report[11] = None
-
-        # insert test report to csv file
-        with open('automation_stability_test.csv', 'a') as f:
-            writer(f).writerow(report)
-            f.close()
-        print("\n", "Event 3 completed!")
-
-    def send_mms_with_picture(iterate=20):
-        """This function Automatically test the MMS (Picture) service of the Messaging app."""
-        print('\n', "Event 4 : Send a MMS with a picture")
-        # test report initiation
-        report[1] = 'Send a MMS with a picture'
-        report[2] = iterate
-        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
-        pass_count, fail_count, test_count = 0, 0, 0
-        start = datetime.datetime.now()
-        while test_count < iterate:
-            try:
-                # Automation Code
-                # send the MMS
-                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
-                driver1.activate_app(MSG_APP_PACKAGE)
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
-                    PH_NUMBER_2)
-                driver1.press_keycode(66)
-                time.sleep(2)
-                # attachment section
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Add files, location and more").click()
-                time.sleep(1)
-                driver1.find_element(AppiumBy.XPATH,
-                                     '//android.view.ViewGroup[@content-desc="Files"]/android.widget.ImageView').click()
-                time.sleep(2)
-                # file selection
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Show roots").click()
-                time.sleep(3)
-                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    print(i.text)
-                    if i.text == "Downloads":
-                        i.click()
-                        break
-                try:
-                    driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "List View").click()
-                except:
-                    print("List View Enabled")
-                time.sleep(3)
-                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    if i.text == "file_example_JPG_1MB.jpg":
-                        print(i.text)
-                        i.click()
-                        break
-                time.sleep(5)
-                driver1.find_element(AppiumBy.ID,
-                                     'com.google.android.apps.messaging:id/compose_message_text').send_keys(
-                    "1234567890@#$%^&*()qwertyuiop[]sdfghjkl;qwertyuiopasdfghjklzxcvbnm,"
-                    "./;12345678901234567890!@#$%^&*(")
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send SMS').click()
-                time.sleep(4)
-
-                # SENT or FAILED
-                try:
-                    if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Now, SMS').is_enabled():
-                        pass_count += 1
-                except:
-                    fail_count += 1
-
-                # Delete the message
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'More conversation options').click()
-                time.sleep(1)
-                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    if i.text == "Delete":
-                        i.click()
-                        break
-                driver1.find_element(AppiumBy.ID, "android:id/button1").click()
-                time.sleep(2)
-                test_count += 1
-                driver1.press_keycode(4)
-                driver1.quit()
-            except Exception as e:
-                fail_count += 1
-                print(f"Iteration = {test_count + 1}| Failed to Send a MMS with a picture! | with Error : {e}")
-            test_count += 1
-        end = datetime.datetime.now()
-        # driver.quit()
-
-        # finishing test report
-        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        report[5] = str(end - start).split('.')[0]
-        report[6] = test_count
-        report[7] = pass_count
-        report[8] = fail_count
-        report[9] = round((pass_count / test_count) * 100, 2)
-        report[10] = None
-        report[11] = None
-
-        # insert test report to csv file
-        with open('automation_stability_test.csv', 'a') as f:
-            writer(f).writerow(report)
-            f.close()
-        print("\n", "Event 4 completed!")
-
-    def open_mms_with_audio(iterate=50):
-        """This function Automatically test the read MMS Audio service of the Messaging app."""
-        print('\n', "Event 5 : Open a MMS with a 1MB audio attachment")
-        # test report initiation
-        report[1] = 'Open a MMS with a 1MB audio attachment'
-        report[2] = iterate
-        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
-        pass_count, fail_count, test_count = 0, 0, 0
-        start = datetime.datetime.now()
-        while test_count < iterate:
-            try:
-                driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
-                driver2.activate_app(MSG_APP_PACKAGE)
-                time.sleep(1)
-                driver2.find_element(AppiumBy.ID,
-                                     "com.google.android.apps.messaging:id/open_search_bar_text_view").click()
-                time.sleep(1)
-                driver2.find_element(AppiumBy.ID,
-                                     "com.google.android.apps.messaging:id/zero_state_search_box_auto_complete").send_keys(
-                    PH_NUMBER_1)
-                driver2.press_keycode(66)
-                time.sleep(1)
-                for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    if PH_NUMBER_1 in i.text:
-                        i.click()
-                        break
-                pass_count += 1
-
-            except Exception as e:
-                fail_count += 1
-                print(
-                    f"Iteration = {test_count + 1}| Failed to Open a MMS with a 1MB audio attachment! | with Error : {e}")
-            test_count += 1
-        end = datetime.datetime.now()
-        # driver.quit()
-
-        # finishing test report
-        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        report[5] = str(end - start).split('.')[0]
-        report[6] = test_count
-        report[7] = pass_count
-        report[8] = fail_count
-        report[9] = round((pass_count / test_count) * 100, 2)
-        report[10] = None
-        report[11] = None
-
-        # insert test report to csv file
-        with open('automation_stability_test.csv', 'a') as f:
-            writer(f).writerow(report)
-            f.close()
-        print("\n", "Event 5 completed!")
-
-    def open_mms_with_video(iterate=50):
-        """This function Automatically test the read MMS Video service of the Messaging app."""
-        print('\n', "Event 6 : Open a MMS with 1MB video attachment")
-        # test report initiation
-        report[1] = 'Open a MMS with 1MB video attachment'
-        report[2] = iterate
-        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
-        pass_count, fail_count, test_count = 0, 0, 0
-        start = datetime.datetime.now()
-        while test_count < iterate:
-            try:
-                driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
-                driver2.activate_app(MSG_APP_PACKAGE)
-                time.sleep(1)
-                driver2.find_element(AppiumBy.ID,
-                                     "com.google.android.apps.messaging:id/open_search_bar_text_view").click()
-                time.sleep(1)
-                driver2.find_element(AppiumBy.ID,
-                                     "com.google.android.apps.messaging:id/zero_state_search_box_auto_complete").send_keys(
-                    PH_NUMBER_1)
-                driver2.press_keycode(66)
-                time.sleep(1)
-                for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    if PH_NUMBER_1 in i.text:
-                        i.click()
-                        break
-                pass_count += 1
-
-            except Exception as e:
-                fail_count += 1
-                print(
-                    f"Iteration = {test_count + 1}| Failed to Open a MMS with 1MB video attachment! | with Error : {e}")
-            test_count += 1
-        end = datetime.datetime.now()
-        # driver.quit()
-
-        # finishing test report
-        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        report[5] = str(end - start).split('.')[0]
-        report[6] = test_count
-        report[7] = pass_count
-        report[8] = fail_count
-        report[9] = round((pass_count / test_count) * 100, 2)
-        report[10] = None
-        report[11] = None
-
-        # insert test report to csv file
-        with open('automation_stability_test.csv', 'a') as f:
-            writer(f).writerow(report)
-            f.close()
-        print("\n", "Event 6 completed!")
-
-    def open_mms_with_video(iterate=50):
-        """This function Automatically test the read MMS Image service of the Messaging app."""
-        print('\n', "Event 6 : Open a MMS with a 1MB image attachment")
-        # test report initiation
-        report[1] = 'Open a MMS with a 1MB image attachment'
-        report[2] = iterate
-        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
-        pass_count, fail_count, test_count = 0, 0, 0
-        start = datetime.datetime.now()
-        while test_count < iterate:
-            try:
-                driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
-                driver2.activate_app(MSG_APP_PACKAGE)
-                time.sleep(1)
-                driver2.find_element(AppiumBy.ID,
-                                     "com.google.android.apps.messaging:id/open_search_bar_text_view").click()
-                time.sleep(1)
-                driver2.find_element(AppiumBy.ID,
-                                     "com.google.android.apps.messaging:id/zero_state_search_box_auto_complete").send_keys(
-                    PH_NUMBER_1)
-                driver2.press_keycode(66)
-                time.sleep(1)
-                for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    if PH_NUMBER_1 in i.text:
-                        i.click()
-                        break
-                pass_count += 1
-
-            except Exception as e:
-                fail_count += 1
-                print(
-                    f"Iteration = {test_count + 1}| Failed to Open a MMS with a 1MB image attachment! | with Error : {e}")
-            test_count += 1
-        end = datetime.datetime.now()
-        # driver.quit()
-
-        # finishing test report
-        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        report[5] = str(end - start).split('.')[0]
-        report[6] = test_count
-        report[7] = pass_count
-        report[8] = fail_count
-        report[9] = round((pass_count / test_count) * 100, 2)
-        report[10] = None
-        report[11] = None
-
-        # insert test report to csv file
-        with open('automation_stability_test.csv', 'a') as f:
-            writer(f).writerow(report)
-            f.close()
-        print("\n", "Event 7 completed!")
-
-    def open_sms(iterate=50):
-        """This function Automatically test the read SMS service of the Messaging app."""
-        print('\n', "Event 8 : Open a SMS (MT)")
-        # test report initiation
-        report[1] = 'Open a SMS (MT)'
-        report[2] = iterate
-        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
-        pass_count, fail_count, test_count = 0, 0, 0
-        start = datetime.datetime.now()
-        while test_count < iterate:
-            try:
-                driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
-                driver2.activate_app(MSG_APP_PACKAGE)
-                time.sleep(1)
-                driver2.find_element(AppiumBy.ID,
-                                     "com.google.android.apps.messaging:id/open_search_bar_text_view").click()
-                time.sleep(1)
-                driver2.find_element(AppiumBy.ID,
-                                     "com.google.android.apps.messaging:id/zero_state_search_box_auto_complete").send_keys(
-                    PH_NUMBER_1)
-                driver2.press_keycode(66)
-                time.sleep(1)
-                for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    if PH_NUMBER_1 in i.text:
-                        i.click()
-                        break
-                pass_count += 1
-
-            except Exception as e:
-                fail_count += 1
-                print(f"Iteration = {test_count + 1}| Failed to Open a SMS (MT)! | with Error : {e}")
-            test_count += 1
-        end = datetime.datetime.now()
-        # driver.quit()
-
-        # finishing test report
-        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        report[5] = str(end - start).split('.')[0]
-        report[6] = test_count
-        report[7] = pass_count
-        report[8] = fail_count
-        report[9] = round((pass_count / test_count) * 100, 2)
-        report[10] = None
-        report[11] = None
-
-        # insert test report to csv file
-        with open('automation_stability_test.csv', 'a') as f:
-            writer(f).writerow(report)
-            f.close()
-        print("\n", "Event 8 completed!")
-
-    def MMS_with_MAXCHAR_AUDIO(iterate=20):
-        """This function Automatically test the MMS service of Messaging app."""
-        # test report
-        report[0] = 'MMS Automation'
-        report[
-            1] = 'Send an SMS maximum number of characters with out requiring the message to be segmented from the DUT.'
-        report[2] = iterate
-        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
-        # driver = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_message_stability)
-
-        pass_count, fail_count, test_count = 0, 0, 0
-        start = datetime.datetime.now()
-        while test_count < iterate:
-            # Automation Code
-            # send the MMS
-            driver = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_message_stability)
-            MT_contact = driver.find_element(AppiumBy.XPATH, '//android.widget.TextView[@content-desc="⁨My Jio⁩"]')
-            MT_contact.click()
-            time.sleep(2)
-            other_option = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Other options')
-            other_option.click()
-            time.sleep(2)
-            audio = driver.find_element(AppiumBy.XPATH,
-                                        '//android.widget.LinearLayout[@content-desc="Audio"]/android.widget.RelativeLayout')
-            audio.click()
-            time.sleep(2)
-            voice_recorder_folder = driver.find_element(AppiumBy.XPATH,
-                                                        '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.view.ViewGroup/android.widget.LinearLayout[2]/android.widget.FrameLayout/android.widget.LinearLayout/androidx.recyclerview.widget.RecyclerView/android.view.ViewGroup[7]')
-            voice_recorder_folder.click()
-            time.sleep(2)
-            select_audio = driver.find_element(AppiumBy.ID, 'com.sec.android.app.myfiles:id/ripple')
-            select_audio.click()
-            time.sleep(2)
-            done = driver.find_element(AppiumBy.XPATH,
-                                       '//android.widget.Button[@content-desc="Done"]/android.view.ViewGroup/android.widget.TextView')
-            done.click()
-            time.sleep(2)
-            text_box = driver.find_element(AppiumBy.ID, 'com.samsung.android.messaging:id/message_edit_text')
-            text_box.send_keys(
-                '1234567890@#$%^&*()qwertyuiop[]sdfghjkl;qwertyuiopasdfghjklzxcvbnm,./;12345678901234567890!@#$%^&*()qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfgjklzxcvbnm1234567890qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm12345678901!@#$%^&*()_+asdfghjklqwertyuopzxcvbnm')
-            send_message = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send')
-            send_message.click()
-            time.sleep(20)
-            # driver.press_keycode(4)
-
-            # SENT or FAILED
-            try:
-                driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Sending') or driver.find_element(
-                    AppiumBy.ACCESSIBILITY_ID, 'Sending failed')
-                fail_count += 1
-            except:
-                pass_count += 1
-            time.sleep(10)
-            delete_settings = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Conversation settings')
-            delete_settings.click()
-            time.sleep(2)
-            delete_message = driver.find_element(AppiumBy.XPATH,
-                                                 '/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.view.ViewGroup/androidx.drawerlayout.widget.DrawerLayout/android.widget.FrameLayout[2]/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.RelativeLayout/android.widget.ScrollView/android.widget.LinearLayout/android.view.ViewGroup[1]/android.view.ViewGroup/android.widget.ImageView')
-            delete_message.click()
-            select_last_message = driver.find_element(AppiumBy.XPATH,
-                                                      '/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.view.ViewGroup/androidx.drawerlayout.widget.DrawerLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.RelativeLayout/android.widget.RelativeLayout/androidx.recyclerview.widget.RecyclerView/android.widget.LinearLayout[3]/android.widget.LinearLayout/android.widget.CheckBox')
-            select_last_message.click()
-            delete_all = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Delete')
-            delete_all.click()
-            time.sleep(2)
-            move_to_recycle = driver.find_element(AppiumBy.ID, 'android:id/button1')
-            move_to_recycle.click()
-            test_count += 1
-            driver.press_keycode(4)
-            driver.quit()
-
-        end = datetime.datetime.now()
-        # driver.quit()
-
-        # finishing test report
-        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        report[5] = str(end - start).split('.')[0]
-        report[6] = test_count
-        report[7] = pass_count
-        report[8] = fail_count
-        report[9] = round((pass_count / test_count) * 100, 2)
-        report[10] = None
-        report[11] = None
-
-        # insert test report to csv file
-        with open('automation_stability_test.csv', 'a') as f:
-            writer(f).writerow(report)
-            f.close()
-
-    # send_sms_maxChar()
-    # send_mms_with_audio()
-    # send_mms_with_video()
-    # send_mms_with_picture()
-    # open_sms()
-    # MMS_with_MAXCHAR_AUDIO(2)
-    print('\n', "-" * 10, ">> Messaging Stability Tests Completed! <<", "-" * 10, '\n')
-
-
 def Multitasking_Stability_Test():
     """
     1. Make a call
@@ -2149,6 +1451,704 @@ def Email_Stability_Test():
     # send_email_with_attachment()
     open_email(2)
     print('\n', "-" * 10, ">> Email Stability Test Completed! <<", "-" * 10, '\n')
+
+
+def Messaging_Stability_Tests():
+    """
+    Messaging Stability Tests
+    1.Send an SMS maximum number of characters without requiring the message to be segmented from the DUT (50)
+    2.Send a MMS with an audio attachment from the device under test (50)
+    3.Send a MMS with a video attachment from the device under test (50)
+    4.Send a MMS with a picture attachment from the device under test (50)
+    5.Open a MMS with a 1MB audio attachment or largest size supported by the device (50)
+    6.Open a MMS with 1MB video or largest size supported by the device (50)
+    7.Open a MMS with a 1MB image or largest size supported by the device (50)
+    8.Open a SMS (50)
+    """
+    print('\n', "-" * 10, ">> Messaging Stability Tests <<", "-" * 10, '\n')
+    report[0] = 'Messaging Stability Test'
+
+    def send_sms_maxChar(iterate=20):
+        """This function Automatically test the SMS service of the Messaging app."""
+        print('\n', "Event 1 : Add an appointment to the Calender ")
+        # test report initiation
+        report[
+            1] = 'Send an SMS maximum number of characters with out requiring the message to be segmented from the DUT.'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                # Automation Code
+                # send the message
+                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+                driver1.activate_app(MSG_APP_PACKAGE)
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
+                    PH_NUMBER_2)
+                driver1.press_keycode(66)
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ID,
+                                     'com.google.android.apps.messaging:id/compose_message_text').send_keys(
+                    '1234567890@#$%^&*()qwertyuiop[]sdfghjkl;qwertyuiopasdfghjklzxcvbnm,./;12345678901234567890!@#$%^&*('
+                    ')qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfgjklzxcvbnm1234567890qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm12345678901!@#$%^&*()_+asdfghjklqwertyuopzxcvbnm')
+
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send SMS').click()
+                time.sleep(4)
+
+                # SENT or FAILED
+                try:
+                    if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Now, SMS').is_enabled():
+                        pass_count += 1
+                except:
+                    fail_count += 1
+
+                # Delete the message
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'More conversation options').click()
+                time.sleep(1)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "Delete":
+                        i.click()
+                        break
+                driver1.find_element(AppiumBy.ID, "android:id/button1").click()
+                time.sleep(2)
+                test_count += 1
+                driver1.press_keycode(4)
+                driver1.quit()
+            except Exception as e:
+                fail_count += 1
+                print(f"Iteration = {test_count + 1}| Failed to Send an SMS! | with Error : {e}")
+            test_count += 1
+        end = datetime.datetime.now()
+        # driver.quit()
+
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 1 completed!")
+
+    def send_mms_with_audio(iterate=20):
+        """This function Automatically test the MMS (Audio) service of the Messaging app."""
+        print('\n', "Event 2 : Send a MMS with an audio attachment")
+        # test report initiation
+        report[1] = 'Send a MMS with an audio attachment'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                # Automation Code
+                # send the MMS
+                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+                driver1.activate_app(MSG_APP_PACKAGE)
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
+                    PH_NUMBER_2)
+                driver1.press_keycode(66)
+                time.sleep(2)
+                # attatchment section
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Add files, location and more").click()
+                time.sleep(1)
+                driver1.find_element(AppiumBy.XPATH,
+                                     '//android.view.ViewGroup[@content-desc="Files"]/android.widget.ImageView').click()
+                time.sleep(2)
+                # file selection
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Show roots").click()
+                time.sleep(2)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView")[1:]:
+                    print(i.text)
+                    if i.text == "Downloads":
+                        i.click()
+                        break
+                try:
+                    driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "List View").click()
+                except:
+                    print("List View Enabled")
+
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "file_example_MP3_1MG.mp3":
+                        print(i.text)
+                        i.click()
+                        break
+                time.sleep(5)
+                driver1.find_element(AppiumBy.ID,
+                                     'com.google.android.apps.messaging:id/compose_message_text').send_keys(
+                    "1234567890@#$%^&*()qwertyuiop[]sdfghjkl;qwertyuiopasdfghjklzxcvbnm,"
+                    "./;12345678901234567890!@#$%^&*(")
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send SMS').click()
+                time.sleep(4)
+
+                # SENT or FAILED
+                try:
+                    if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Now, SMS').is_enabled():
+                        pass_count += 1
+                except:
+                    fail_count += 1
+
+                # Delete the message
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'More conversation options').click()
+                time.sleep(1)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "Delete":
+                        i.click()
+                        break
+                driver1.find_element(AppiumBy.ID, "android:id/button1").click()
+                time.sleep(2)
+                test_count += 1
+                driver1.press_keycode(4)
+                driver1.quit()
+            except Exception as e:
+                fail_count += 1
+                print(
+                    f"Iteration = {test_count + 1}| Failed to 'Send a MMS with an audio attachment'! | with Error : {e}")
+            test_count += 1
+        end = datetime.datetime.now()
+        # driver.quit()
+
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 2 completed!")
+
+    def send_mms_with_video(iterate=20):
+        """This function Automatically test the MMS (Video) service of the Messaging app."""
+        print('\n', "Event 3 : Send a MMS with a video attachment")
+        # test report initiation
+        report[1] = 'Send a MMS with a video attachment'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                # Automation Code
+                # send the MMS
+                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+                driver1.activate_app(MSG_APP_PACKAGE)
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
+                    PH_NUMBER_2)
+                driver1.press_keycode(66)
+                time.sleep(2)
+                # attatchment section
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Add files, location and more").click()
+                time.sleep(1)
+                driver1.find_element(AppiumBy.XPATH,
+                                     '//android.view.ViewGroup[@content-desc="Files"]/android.widget.ImageView').click()
+                time.sleep(2)
+                # file selection
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Show roots").click()
+                time.sleep(3)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    print(i.text)
+                    if i.text == "Downloads":
+                        i.click()
+                        break
+                # try:
+                #     driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "List View").click()
+                # except:
+                #     print("List View Enabled")
+                time.sleep(3)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "file_example_MP4_480_1_5MG.mp4":
+                        print(i.text)
+                        i.click()
+                        break
+                time.sleep(5)
+                driver1.find_element(AppiumBy.ID,
+                                     'com.google.android.apps.messaging:id/compose_message_text').send_keys(
+                    "1234567890@#$%^&*()qwertyuiop[]sdfghjkl;qwertyuiopasdfghjklzxcvbnm,"
+                    "./;12345678901234567890!@#$%^&*(")
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send SMS').click()
+                time.sleep(4)
+
+                # SENT or FAILED
+                try:
+                    if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Now, SMS').is_enabled():
+                        pass_count += 1
+                except:
+                    fail_count += 1
+
+                # Delete the message
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'More conversation options').click()
+                time.sleep(1)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "Delete":
+                        i.click()
+                        break
+                driver1.find_element(AppiumBy.ID, "android:id/button1").click()
+                time.sleep(2)
+                test_count += 1
+                driver1.press_keycode(4)
+                driver1.quit()
+            except Exception as e:
+                fail_count += 1
+                print(f"Iteration = {test_count + 1}| Failed to Send a MMS with a video attachment! | with Error : {e}")
+            test_count += 1
+        end = datetime.datetime.now()
+        # driver.quit()
+
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 3 completed!")
+
+    def send_mms_with_picture(iterate=20):
+        """This function Automatically test the MMS (Picture) service of the Messaging app."""
+        print('\n', "Event 4 : Send a MMS with a picture")
+        # test report initiation
+        report[1] = 'Send a MMS with a picture'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                # Automation Code
+                # send the MMS
+                driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+                driver1.activate_app(MSG_APP_PACKAGE)
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
+                    PH_NUMBER_2)
+                driver1.press_keycode(66)
+                time.sleep(2)
+                # attachment section
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Add files, location and more").click()
+                time.sleep(1)
+                driver1.find_element(AppiumBy.XPATH,
+                                     '//android.view.ViewGroup[@content-desc="Files"]/android.widget.ImageView').click()
+                time.sleep(2)
+                # file selection
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Show roots").click()
+                time.sleep(3)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    print(i.text)
+                    if i.text == "Downloads":
+                        i.click()
+                        break
+                try:
+                    driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "List View").click()
+                except:
+                    print("List View Enabled")
+                time.sleep(3)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "file_example_JPG_1MB.jpg":
+                        print(i.text)
+                        i.click()
+                        break
+                time.sleep(5)
+                driver1.find_element(AppiumBy.ID,
+                                     'com.google.android.apps.messaging:id/compose_message_text').send_keys(
+                    "1234567890@#$%^&*()qwertyuiop[]sdfghjkl;qwertyuiopasdfghjklzxcvbnm,"
+                    "./;12345678901234567890!@#$%^&*(")
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send SMS').click()
+                time.sleep(4)
+
+                # SENT or FAILED
+                try:
+                    if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'Now, SMS').is_enabled():
+                        pass_count += 1
+                except:
+                    fail_count += 1
+
+                # Delete the message
+                time.sleep(1)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, 'More conversation options').click()
+                time.sleep(1)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "Delete":
+                        i.click()
+                        break
+                driver1.find_element(AppiumBy.ID, "android:id/button1").click()
+                time.sleep(2)
+                test_count += 1
+                driver1.press_keycode(4)
+                driver1.quit()
+            except Exception as e:
+                fail_count += 1
+                print(f"Iteration = {test_count + 1}| Failed to Send a MMS with a picture! | with Error : {e}")
+            test_count += 1
+        end = datetime.datetime.now()
+        # driver.quit()
+
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 4 completed!")
+
+    def open_mms_with_audio(iterate=50):
+        """This function Automatically test the read MMS Audio service of the Messaging app."""
+        print('\n', "Event 5 : Open a MMS with a 1MB audio attachment")
+        # test report initiation
+        report[1] = 'Open a MMS with a 1MB audio attachment'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
+                driver2.activate_app(MSG_APP_PACKAGE)
+                time.sleep(1)
+                driver2.find_element(AppiumBy.ID,
+                                     "com.google.android.apps.messaging:id/open_search_bar_text_view").click()
+                time.sleep(1)
+                driver2.find_element(AppiumBy.ID,
+                                     "com.google.android.apps.messaging:id/zero_state_search_box_auto_complete").send_keys(
+                    PH_NUMBER_1)
+                driver2.press_keycode(66)
+                time.sleep(1)
+                for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if PH_NUMBER_1 in i.text:
+                        i.click()
+                        break
+                pass_count += 1
+
+            except Exception as e:
+                fail_count += 1
+                print(
+                    f"Iteration = {test_count + 1}| Failed to Open a MMS with a 1MB audio attachment! | with Error : {e}")
+            test_count += 1
+        end = datetime.datetime.now()
+        # driver.quit()
+
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 5 completed!")
+
+    def open_mms_with_video(iterate=50):
+        """This function Automatically test the read MMS Video service of the Messaging app."""
+        print('\n', "Event 6 : Open a MMS with 1MB video attachment")
+        # test report initiation
+        report[1] = 'Open a MMS with 1MB video attachment'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
+                driver2.activate_app(MSG_APP_PACKAGE)
+                time.sleep(1)
+                driver2.find_element(AppiumBy.ID,
+                                     "com.google.android.apps.messaging:id/open_search_bar_text_view").click()
+                time.sleep(1)
+                driver2.find_element(AppiumBy.ID,
+                                     "com.google.android.apps.messaging:id/zero_state_search_box_auto_complete").send_keys(
+                    PH_NUMBER_1)
+                driver2.press_keycode(66)
+                time.sleep(1)
+                for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if PH_NUMBER_1 in i.text:
+                        i.click()
+                        break
+                pass_count += 1
+
+            except Exception as e:
+                fail_count += 1
+                print(
+                    f"Iteration = {test_count + 1}| Failed to Open a MMS with 1MB video attachment! | with Error : {e}")
+            test_count += 1
+        end = datetime.datetime.now()
+        # driver.quit()
+
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 6 completed!")
+
+    def open_mms_with_video(iterate=50):
+        """This function Automatically test the read MMS Image service of the Messaging app."""
+        print('\n', "Event 6 : Open a MMS with a 1MB image attachment")
+        # test report initiation
+        report[1] = 'Open a MMS with a 1MB image attachment'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
+                driver2.activate_app(MSG_APP_PACKAGE)
+                time.sleep(1)
+                driver2.find_element(AppiumBy.ID,
+                                     "com.google.android.apps.messaging:id/open_search_bar_text_view").click()
+                time.sleep(1)
+                driver2.find_element(AppiumBy.ID,
+                                     "com.google.android.apps.messaging:id/zero_state_search_box_auto_complete").send_keys(
+                    PH_NUMBER_1)
+                driver2.press_keycode(66)
+                time.sleep(1)
+                for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if PH_NUMBER_1 in i.text:
+                        i.click()
+                        break
+                pass_count += 1
+
+            except Exception as e:
+                fail_count += 1
+                print(
+                    f"Iteration = {test_count + 1}| Failed to Open a MMS with a 1MB image attachment! | with Error : {e}")
+            test_count += 1
+        end = datetime.datetime.now()
+        # driver.quit()
+
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 7 completed!")
+
+    def open_sms(iterate=50):
+        """This function Automatically test the read SMS service of the Messaging app."""
+        print('\n', "Event 8 : Open a SMS (MT)")
+        # test report initiation
+        report[1] = 'Open a SMS (MT)'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            try:
+                driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
+                driver2.activate_app(MSG_APP_PACKAGE)
+                time.sleep(1)
+                driver2.find_element(AppiumBy.ID,
+                                     "com.google.android.apps.messaging:id/open_search_bar_text_view").click()
+                time.sleep(1)
+                driver2.find_element(AppiumBy.ID,
+                                     "com.google.android.apps.messaging:id/zero_state_search_box_auto_complete").send_keys(
+                    PH_NUMBER_1)
+                driver2.press_keycode(66)
+                time.sleep(1)
+                for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if PH_NUMBER_1 in i.text:
+                        i.click()
+                        break
+                pass_count += 1
+
+            except Exception as e:
+                fail_count += 1
+                print(f"Iteration = {test_count + 1}| Failed to Open a SMS (MT)! | with Error : {e}")
+            test_count += 1
+        end = datetime.datetime.now()
+        # driver.quit()
+
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 8 completed!")
+
+    def MMS_with_MAXCHAR_AUDIO(iterate=20):
+        """This function Automatically test the MMS service of Messaging app."""
+        # test report
+        report[0] = 'MMS Automation'
+        report[
+            1] = 'Send an SMS maximum number of characters with out requiring the message to be segmented from the DUT.'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        # driver = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_message_stability)
+
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+        while test_count < iterate:
+            # Automation Code
+            # send the MMS
+            driver = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap_message_stability)
+            MT_contact = driver.find_element(AppiumBy.XPATH, '//android.widget.TextView[@content-desc="⁨My Jio⁩"]')
+            MT_contact.click()
+            time.sleep(2)
+            other_option = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Other options')
+            other_option.click()
+            time.sleep(2)
+            audio = driver.find_element(AppiumBy.XPATH,
+                                        '//android.widget.LinearLayout[@content-desc="Audio"]/android.widget.RelativeLayout')
+            audio.click()
+            time.sleep(2)
+            voice_recorder_folder = driver.find_element(AppiumBy.XPATH,
+                                                        '/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.view.ViewGroup/android.widget.LinearLayout[2]/android.widget.FrameLayout/android.widget.LinearLayout/androidx.recyclerview.widget.RecyclerView/android.view.ViewGroup[7]')
+            voice_recorder_folder.click()
+            time.sleep(2)
+            select_audio = driver.find_element(AppiumBy.ID, 'com.sec.android.app.myfiles:id/ripple')
+            select_audio.click()
+            time.sleep(2)
+            done = driver.find_element(AppiumBy.XPATH,
+                                       '//android.widget.Button[@content-desc="Done"]/android.view.ViewGroup/android.widget.TextView')
+            done.click()
+            time.sleep(2)
+            text_box = driver.find_element(AppiumBy.ID, 'com.samsung.android.messaging:id/message_edit_text')
+            text_box.send_keys(
+                '1234567890@#$%^&*()qwertyuiop[]sdfghjkl;qwertyuiopasdfghjklzxcvbnm,./;12345678901234567890!@#$%^&*()qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfgjklzxcvbnm1234567890qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm12345678901!@#$%^&*()_+asdfghjklqwertyuopzxcvbnm')
+            send_message = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Send')
+            send_message.click()
+            time.sleep(20)
+            # driver.press_keycode(4)
+
+            # SENT or FAILED
+            try:
+                driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Sending') or driver.find_element(
+                    AppiumBy.ACCESSIBILITY_ID, 'Sending failed')
+                fail_count += 1
+            except:
+                pass_count += 1
+            time.sleep(10)
+            delete_settings = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Conversation settings')
+            delete_settings.click()
+            time.sleep(2)
+            delete_message = driver.find_element(AppiumBy.XPATH,
+                                                 '/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.view.ViewGroup/androidx.drawerlayout.widget.DrawerLayout/android.widget.FrameLayout[2]/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.RelativeLayout/android.widget.ScrollView/android.widget.LinearLayout/android.view.ViewGroup[1]/android.view.ViewGroup/android.widget.ImageView')
+            delete_message.click()
+            select_last_message = driver.find_element(AppiumBy.XPATH,
+                                                      '/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.view.ViewGroup/androidx.drawerlayout.widget.DrawerLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.RelativeLayout/android.widget.RelativeLayout/androidx.recyclerview.widget.RecyclerView/android.widget.LinearLayout[3]/android.widget.LinearLayout/android.widget.CheckBox')
+            select_last_message.click()
+            delete_all = driver.find_element(AppiumBy.ACCESSIBILITY_ID, 'Delete')
+            delete_all.click()
+            time.sleep(2)
+            move_to_recycle = driver.find_element(AppiumBy.ID, 'android:id/button1')
+            move_to_recycle.click()
+            test_count += 1
+            driver.press_keycode(4)
+            driver.quit()
+
+        end = datetime.datetime.now()
+        # driver.quit()
+
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
+        report[10] = None
+        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+
+    # send_sms_maxChar()
+    # send_mms_with_audio()
+    # send_mms_with_video()
+    # send_mms_with_picture()
+    # open_sms()
+    # MMS_with_MAXCHAR_AUDIO(2)
+    print('\n', "-" * 10, ">> Messaging Stability Tests Completed! <<", "-" * 10, '\n')
 
 
 def Telephony_Stability_Test():
@@ -3520,6 +3520,17 @@ def PIM_stability_test():
 def IPME_Wave1_stability_test():
     """
     IPME (Wave 1) Stability Test
+    Events:
+
+    ** using Cellular network
+    1.Texting - Chat mode : Send a chat message to another IPME enabled device with 200 characters
+    2.Texting - Pager mode : Send a pager mode message to a non-IPME enabled device with 200 characters
+    3.File Transfer - Send a 10MB file to another IPME enabled device
+    4.Large message mode : end a 1MB file to a non IPME enabled device
+
+    ** Use a Wi-Fi network for the following tests
+    5.Texting – Chat Mode over Wi-Fi : Send a chat message to another IPME enabled device with 200 characters
+    6.File Transfer over Wi-Fi : Send a 10MB file to another IPME enabled device
     """
 
     print('\n', "-" * 10, ">> IPME (Wave 1) Stability Test <<", "-" * 10, '\n')
@@ -3537,40 +3548,100 @@ def IPME_Wave1_stability_test():
         # enable cellular network only
         driver1.set_network_connection(4)
         driver2.set_network_connection(4)
-        # enable chat features if disabled
-        enable_chat_feature(driver1)
-        enable_chat_feature(driver2)
+        print("-->> Only Cellular Network Enabled on both MO & MT")
+        # enable chat features if disabled & check status
+        print("MO Device :")
+        f1 = enable_chat_feature(driver1)
+        print("MT Device :")
+        f2 = enable_chat_feature(driver2)
+
         # loop variable initiation
         pass_count, fail_count, test_count = 0, 0, 0
         start = datetime.datetime.now()
-        while test_count < iterate:
-            try:
-                # launch message app
-                driver1.activate_app(MSG_APP_PACKAGE)
-                time.sleep(2)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
-                    PH_NUMBER_2)
-                driver1.press_keycode(66)
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ID,
-                                     "com.google.android.apps.messaging:id/compose_message_text").send_keys(MSG_TEXT)
-                time.sleep(2)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Send SMS").click()
-                # check sent or failed
-                time.sleep(2)
-                if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Now, SMS").text == "Now • SMS":
-                    pass_count += 1
-                else:
-                    fail_count += 1
-                driver1.press_keycode(4)
-                driver1.press_keycode(4)
-                driver1.press_keycode(3)
-            except Exception as e:
-                print(f"Iteration = {test_count + 1}| Texting Chat mode Failed! | with Error : {e}")
-            test_count += 1
 
+        if f1 & f2:
+            while test_count < iterate:
+                try:
+                    if test_count == 0:
+                        # launch message app
+                        driver1.activate_app(MSG_APP_PACKAGE)
+                        time.sleep(2)
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
+                        time.sleep(1)
+                        driver1.find_element(AppiumBy.ID,
+                                             "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
+                            PH_NUMBER_2)
+                        driver1.press_keycode(66)
+                        time.sleep(1)
+                        driver1.find_element(AppiumBy.ID,
+                                             "com.google.android.apps.messaging:id/compose_message_text").send_keys(
+                            MSG_TEXT)
+                        time.sleep(2)
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Send end-to-end encrypted message").click()
+                        # open MT chat box
+                        time.sleep(2)
+                        driver2.activate_app(MSG_APP_PACKAGE)
+                        time.sleep(2)
+                        for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                            if PH_NUMBER_1[:5] in i.text:
+                                i.click()
+                                break
+                        time.sleep(7)
+                        # check sent or failed
+                        if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Now, Read").text == "Now • Read":
+                            pass_count += 1
+                        else:
+                            fail_count += 1
+                    else:
+                        driver1.find_element(AppiumBy.ID,
+                                             "com.google.android.apps.messaging:id/compose_message_text").send_keys(
+                            MSG_TEXT)
+                        time.sleep(2)
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Send end-to-end encrypted message").click()
+                        # check sent or failed
+                        time.sleep(5)
+                        if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Now, Read").text == "Now • Read":
+                            pass_count += 1
+                        else:
+                            fail_count += 1
+                except Exception as e:
+                    print(f"Iteration = {test_count + 1}| Texting Chat mode Failed! | with Error : {e}")
+                test_count += 1
+                time.sleep(3)
+            # Delete msg on both MO & MT
+            time.sleep(3)
+            driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "More conversation options").click()
+            driver2.find_element(AppiumBy.ACCESSIBILITY_ID, "More conversation options").click()
+            time.sleep(2)
+            for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                if i.text == "Delete":
+                    i.click()
+                    break
+            for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                if i.text == "Delete":
+                    i.click()
+                    break
+            time.sleep(2)
+            driver1.find_element(AppiumBy.ID, "android:id/button1").click()
+            driver2.find_element(AppiumBy.ID, "android:id/button1").click()
+            time.sleep(2)
+            driver1.press_keycode(4)
+            driver2.press_keycode(4)
+            driver1.press_keycode(3)
+            driver2.press_keycode(3)
+            report[10] = None
+            report[11] = None
+        elif f1:
+            report[10] = "Unable to perform Event 1 : Texting Chat mode "
+            report[11] = "Bcoz, Chat Feature is not CONNECTED in MT."
+        elif f2:
+            report[10] = "Unable to perform Event 1 : Texting Chat mode "
+            report[11] = "Bcoz, Chat Feature is not CONNECTED in M0."
+        else:
+            report[10] = "Unable to perform Event 1 : Texting Chat mode "
+            report[11] = "Bcoz, Chat Feature is not CONNECTED in both MO & MT."
+        driver1.quit()
+        driver2.quit()
         end = datetime.datetime.now()
         # finishing test report
         report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -3579,8 +3650,6 @@ def IPME_Wave1_stability_test():
         report[7] = pass_count
         report[8] = fail_count
         report[9] = round((pass_count / test_count) * 100, 2)
-        report[10] = None
-        report[11] = None
 
         # insert test report to csv file
         with open('automation_stability_test.csv', 'a') as f:
@@ -3600,39 +3669,99 @@ def IPME_Wave1_stability_test():
         # enable cellular network only
         driver1.set_network_connection(4)
         driver2.set_network_connection(4)
-        # enable chat features if disabled
-        enable_chat_feature(driver1)
-        disable_chat_feature(driver2)
+        print("-->> Only Cellular Network Enabled on both MO & MT")
+        # enable chat features if disabled & check status
+        print("MO Device :")
+        f1 = enable_chat_feature(driver1)
+        print("MT Device :")
+        f2 = disable_chat_feature(driver2)
+
         # loop variable initiation
         pass_count, fail_count, test_count = 0, 0, 0
         start = datetime.datetime.now()
-        while test_count < iterate:
-            try:
-                # launch message app
-                driver1.activate_app(MSG_APP_PACKAGE)
-                time.sleep(2)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
-                    PH_NUMBER_2)
-                driver1.press_keycode(66)
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ID,
-                                     "com.google.android.apps.messaging:id/compose_message_text").send_keys(MSG_TEXT)
-                time.sleep(2)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Send SMS").click()
-                # check sent or failed
-                time.sleep(2)
-                if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Now, SMS").text == "Now • SMS":
-                    pass_count += 1
-                else:
-                    fail_count += 1
-                driver1.press_keycode(4)
-                driver1.press_keycode(4)
-                driver1.press_keycode(3)
-            except Exception as e:
-                print(f"Iteration = {test_count + 1}| Texting Pager mode Failed! | with Error : {e}")
-            test_count += 1
+
+        if f1 & f2:
+            while test_count < iterate:
+                try:
+                    if test_count == 0:
+                        # launch message app
+                        driver1.activate_app(MSG_APP_PACKAGE)
+                        time.sleep(2)
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
+                        time.sleep(1)
+                        driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
+                            PH_NUMBER_2)
+                        driver1.press_keycode(66)
+                        time.sleep(1)
+                        driver1.find_element(AppiumBy.ID,
+                                             "com.google.android.apps.messaging:id/compose_message_text").send_keys(MSG_TEXT)
+                        time.sleep(2)
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Send SMS").click()
+                        # open MT chat box
+                        time.sleep(2)
+                        driver2.activate_app(MSG_APP_PACKAGE)
+                        time.sleep(2)
+                        for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                            if PH_NUMBER_1[:5] in i.text:
+                                i.click()
+                                break
+                        # check sent or failed
+                        time.sleep(2)
+                        if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Now, SMS").text == "Now • SMS":
+                            pass_count += 1
+                        else:
+                            fail_count += 1
+                    else:
+                        time.sleep(1)
+                        driver1.find_element(AppiumBy.ID,
+                                             "com.google.android.apps.messaging:id/compose_message_text").send_keys(
+                            MSG_TEXT)
+                        time.sleep(2)
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Send SMS").click()
+                        # check sent or failed
+                        time.sleep(2)
+                        if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Now, SMS").text == "Now • SMS":
+                            pass_count += 1
+                        else:
+                            fail_count += 1
+                except Exception as e:
+                    print(f"Iteration = {test_count + 1}| Texting Pager mode Failed! | with Error : {e}")
+                test_count += 1
+                time.sleep(3)
+            # Delete msg on both MO & MT
+            time.sleep(3)
+            driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "More conversation options").click()
+            driver2.find_element(AppiumBy.ACCESSIBILITY_ID, "More conversation options").click()
+            time.sleep(2)
+            for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                if i.text == "Delete":
+                    i.click()
+                    break
+            for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                if i.text == "Delete":
+                    i.click()
+                    break
+            time.sleep(2)
+            driver1.find_element(AppiumBy.ID, "android:id/button1").click()
+            driver2.find_element(AppiumBy.ID, "android:id/button1").click()
+            time.sleep(2)
+            driver1.press_keycode(4)
+            driver2.press_keycode(4)
+            driver1.press_keycode(3)
+            driver2.press_keycode(3)
+            report[10] = None
+            report[11] = None
+        elif f1:
+            report[10] = "Unable to perform Event 2 : Texting Pager mode "
+            report[11] = "Bcoz, Chat Feature is not CONNECTED in MT."
+        elif f2:
+            report[10] = "Unable to perform Event 2 : Texting Pager mode "
+            report[11] = "Bcoz, Chat Feature is not CONNECTED in M0."
+        else:
+            report[10] = "Unable to perform Event 2 : Texting Pager mode "
+            report[11] = "Bcoz, Chat Feature is not CONNECTED in both MO & MT."
+        driver1.quit()
+        driver2.quit()
 
         end = datetime.datetime.now()
         # finishing test report
@@ -3663,55 +3792,138 @@ def IPME_Wave1_stability_test():
         # enable cellular network only
         driver1.set_network_connection(4)
         driver2.set_network_connection(4)
-        # enable chat features if disabled
-        enable_chat_feature(driver1)
-        enable_chat_feature(driver2)
+        print("-->> Only Cellular Network Enabled on both MO & MT")
+        # enable chat features if disabled & check status
+        print("MO Device :")
+        f1 = enable_chat_feature(driver1)
+        print("MT Device :")
+        f2 = enable_chat_feature(driver2)
+
         # loop variable initiation
         pass_count, fail_count, test_count = 0, 0, 0
         start = datetime.datetime.now()
-        while test_count < iterate:
-            try:
-                # launch message app
-                driver1.activate_app(MSG_APP_PACKAGE)
-                time.sleep(2)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
-                    PH_NUMBER_2)
-                driver1.press_keycode(66)
-                time.sleep(2)
-                # attatchment section
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Add files, location and more").click()
-                time.sleep(1)
-                driver1.find_element(AppiumBy.XPATH,
-                                     '//android.view.ViewGroup[@content-desc="Files"]/android.widget.ImageView').click()
-                time.sleep(2)
-                # file selection
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Show roots").click()
-                time.sleep(1)
-                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    if i.text == "Downloads":
-                        i.click()
-                        break
-                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    if i.text == "sample-pdf-file.pdf":
-                        i.click()
-                        break
-                time.sleep(2)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Send SMS").click()
-                # check sent or failed
-                time.sleep(60)
-                if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Now, SMS").text == "Now • SMS":
-                    pass_count += 1
-                else:
+
+        if f1 & f2:
+            while test_count < iterate:
+                try:
+                    if test_count == 0:
+                        # launch message app
+                        driver1.activate_app(MSG_APP_PACKAGE)
+                        time.sleep(2)
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
+                        time.sleep(1)
+                        driver1.find_element(AppiumBy.ID,
+                                             "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
+                            PH_NUMBER_2)
+                        driver1.press_keycode(66)
+                        time.sleep(3)
+
+                        # attachment section
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Add files, location and more").click()
+                        time.sleep(1)
+                        driver1.find_element(AppiumBy.XPATH,
+                                             '//android.view.ViewGroup[@content-desc="Files"]/android.widget.ImageView').click()
+                        time.sleep(2)
+                        # file selection
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Show roots").click()
+                        time.sleep(3)
+                        for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                            if i.text == "Downloads":
+                                i.click()
+                                break
+                        time.sleep(2)
+                        for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                            if i.text == "Free_Test_Data_10MB_MP4.mp4":
+                                i.click()
+                                break
+                        time.sleep(2)
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Send end-to-end encrypted message").click()
+                        flag = True
+                        while flag:
+                            # open MT chat box
+                            driver1.activate_app(MSG_APP_PACKAGE)
+                            time.sleep(2)
+                            for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                                if PH_NUMBER_1[:5] in i.text:
+                                    i.click()
+                                    flag = False
+                                    break
+                        time.sleep(5)
+                        # check sent or failed
+                        status = driver1.find_element(AppiumBy.ID,
+                                                      "com.google.android.apps.messaging:id/message_status").text
+                        if "Seen" in status:
+                            pass_count += 1
+                        else:
+                            fail_count += 1
+
+                    else:
+                        # attachment section
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Add files, location and more").click()
+                        time.sleep(1)
+                        driver1.find_element(AppiumBy.XPATH,
+                                             '//android.view.ViewGroup[@content-desc="Files"]/android.widget.ImageView').click()
+                        time.sleep(2)
+                        # file selection
+                        for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                            if i.text == "Free_Test_Data_10MB_MP4.mp4":
+                                i.click()
+                                break
+                        time.sleep(2)
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Send end-to-end encrypted message").click()
+                        flag = True
+                        while flag:
+                            driver2.activate_app(MSG_APP_PACKAGE)
+                            status = driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/message_status").text
+                            if "Seen" in status:
+                                flag = False
+                        status = driver1.find_element(AppiumBy.ID,
+                                                      "com.google.android.apps.messaging:id/message_status").text
+                        if "Seen" in status:
+                            pass_count += 1
+                        else:
+                            fail_count += 1
+                    driver1.press_keycode(4)
+                except Exception as e:
                     fail_count += 1
+                    print(f"Iteration = {test_count + 1}| File Transfer Failed! | with Error : {e}")
+                test_count += 1
+                time.sleep(3)
+            try:
+                # Delete msg on both MO & MT
+                time.sleep(3)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "More conversation options").click()
+                driver2.find_element(AppiumBy.ACCESSIBILITY_ID, "More conversation options").click()
+                time.sleep(2)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "Delete":
+                        i.click()
+                        break
+                for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "Delete":
+                        i.click()
+                        break
+                time.sleep(2)
+                driver1.find_element(AppiumBy.ID, "android:id/button1").click()
+                driver2.find_element(AppiumBy.ID, "android:id/button1").click()
+                time.sleep(2)
                 driver1.press_keycode(4)
-                driver1.press_keycode(4)
+                driver2.press_keycode(4)
                 driver1.press_keycode(3)
-            except Exception as e:
-                fail_count += 1
-                print(f"Iteration = {test_count + 1}| File Transfer Failed! | with Error : {e}")
-            test_count += 1
+                driver2.press_keycode(3)
+                report[10] = None
+                report[11] = None
+            except:
+                print("Failed to Delete messages")
+        elif f1:
+            report[10] = "Unable to perform Event 3 : File Transfer  "
+            report[11] = "Bcoz, Chat Feature is not CONNECTED in MT."
+        elif f2:
+            report[10] = "Unable to perform Event 3 : File Transfer  "
+            report[11] = "Bcoz, Chat Feature is not CONNECTED in M0."
+        else:
+            report[10] = "Unable to perform Event 3 : File Transfer  "
+            report[11] = "Bcoz, Chat Feature is not CONNECTED in both MO & MT."
         driver1.quit()
         driver2.quit()
         end = datetime.datetime.now()
@@ -3722,8 +3934,6 @@ def IPME_Wave1_stability_test():
         report[7] = pass_count
         report[8] = fail_count
         report[9] = round((pass_count / test_count) * 100, 2)
-        report[10] = None
-        report[11] = None
 
         # insert test report to csv file
         with open('automation_stability_test.csv', 'a') as f:
@@ -3732,9 +3942,9 @@ def IPME_Wave1_stability_test():
         print("\n", "Event 3 completed!")
 
     def large_msg_mode(iterate=80):
-        print('\n', "Event 3 : File Transfer ")
+        print('\n', "Event 4 : Large message mode ")
         # test report initiation
-        report[1] = 'File Transfer'
+        report[1] = 'Large message mode'
         report[2] = iterate
         report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         # connecting devices
@@ -3743,57 +3953,130 @@ def IPME_Wave1_stability_test():
         # enable cellular network only
         driver1.set_network_connection(4)
         driver2.set_network_connection(4)
-        # enable chat features if disabled
-        enable_chat_feature(driver1)
-        disable_chat_feature(driver2)
+        print("-->> Only Cellular Network Enabled on both MO & MT")
+        # enable chat features if disabled & check status
+        print("MO Device :")
+        f1 = enable_chat_feature(driver1)
+        print("MT Device :")
+        f2 = disable_chat_feature(driver2)
+
         # loop variable initiation
         pass_count, fail_count, test_count = 0, 0, 0
         start = datetime.datetime.now()
-        while test_count < iterate:
-            try:
-                # launch message app
-                driver1.activate_app(MSG_APP_PACKAGE)
-                time.sleep(2)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
-                    PH_NUMBER_2)
-                driver1.press_keycode(66)
-                time.sleep(2)
-                # attatchment section
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Add files, location and more").click()
-                time.sleep(1)
-                driver1.find_element(AppiumBy.XPATH,
-                                     '//android.view.ViewGroup[@content-desc="Files"]/android.widget.ImageView').click()
-                time.sleep(2)
-                # file selection
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Show roots").click()
-                time.sleep(1)
-                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    if i.text == "Downloads":
-                        i.click()
-                        break
-                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    if i.text == "sample-pdf-file.pdf":
-                        i.click()
-                        break
-                time.sleep(2)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Send SMS").click()
-                # check sent or failed
-                time.sleep(60)
-                if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Now, SMS").text == "Now • SMS":
-                    pass_count += 1
-                else:
-                    fail_count += 1
-                driver1.press_keycode(4)
-                driver1.press_keycode(4)
-                driver1.press_keycode(3)
-            except Exception as e:
-                fail_count += 1
-                print(f"Iteration = {test_count + 1}| File Transfer Failed! | with Error : {e}")
-            test_count += 1
+
+        if f1 & f2:
+            while test_count < iterate:
+                try:
+                    if test_count == 0:
+                        # launch message app
+                        driver1.activate_app(MSG_APP_PACKAGE)
+                        time.sleep(2)
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
+                        time.sleep(1)
+                        driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
+                            PH_NUMBER_2)
+                        driver1.press_keycode(66)
+                        time.sleep(2)
+                        # attachment section
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Add files, location and more").click()
+                        time.sleep(1)
+                        driver1.find_element(AppiumBy.XPATH,
+                                             '//android.view.ViewGroup[@content-desc="Files"]/android.widget.ImageView').click()
+                        time.sleep(2)
+                        # file selection
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Show roots").click()
+                        time.sleep(1)
+                        for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                            if i.text == "Downloads":
+                                i.click()
+                                break
+                        for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                            if i.text == "sample-pdf-file.pdf":
+                                i.click()
+                                break
+                        time.sleep(2)
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Send SMS").click()
+                        # open MT chat box
+                        time.sleep(2)
+                        driver2.activate_app(MSG_APP_PACKAGE)
+                        time.sleep(10)
+                        for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                            if PH_NUMBER_1[:5] in i.text:
+                                i.click()
+                                break
+                        # check sent or failed
+                        time.sleep(15)
+                        if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Now, SMS").text == "Now • SMS":
+                            pass_count += 1
+                        else:
+                            fail_count += 1
+                    else:
+                        time.sleep(1)
+                        # attachment section
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Add files, location and more").click()
+                        time.sleep(1)
+                        driver1.find_element(AppiumBy.XPATH,
+                                             '//android.view.ViewGroup[@content-desc="Files"]/android.widget.ImageView').click()
+                        time.sleep(2)
+                        # file selection
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Show roots").click()
+                        time.sleep(1)
+                        for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                            if i.text == "Downloads":
+                                i.click()
+                                break
+                        for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                            if i.text == "sample-pdf-file.pdf":
+                                i.click()
+                                break
+                        time.sleep(2)
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Send SMS").click()
+                        # check sent or failed
+                        time.sleep(10)
+                        if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Now, SMS").text == "Now • SMS":
+                            pass_count += 1
+                        else:
+                            fail_count += 1
+                    driver1.press_keycode(4)
+                except Exception as e:
+                    print(f"Iteration = {test_count + 1}| Large message mode Failed! | with Error : {e}")
+                test_count += 1
+                time.sleep(3)
+            # Delete msg on both MO & MT
+            time.sleep(3)
+            driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "More conversation options").click()
+            driver2.find_element(AppiumBy.ACCESSIBILITY_ID, "More conversation options").click()
+            time.sleep(2)
+            for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                if i.text == "Delete":
+                    i.click()
+                    break
+            for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                if i.text == "Delete":
+                    i.click()
+                    break
+            time.sleep(2)
+            driver1.find_element(AppiumBy.ID, "android:id/button1").click()
+            driver2.find_element(AppiumBy.ID, "android:id/button1").click()
+            time.sleep(2)
+            driver1.press_keycode(4)
+            driver2.press_keycode(4)
+            driver1.press_keycode(3)
+            driver2.press_keycode(3)
+            report[10] = None
+            report[11] = None
+        elif f1:
+            report[10] = "Unable to perform Event 4 : Large message mode "
+            report[11] = "Bcoz, Chat Feature is not CONNECTED in MT."
+        elif f2:
+            report[10] = "Unable to perform Event 4 : Large message mode "
+            report[11] = "Bcoz, Chat Feature is not CONNECTED in M0."
+        else:
+            report[10] = "Unable to perform Event 4 : Large message mode"
+            report[11] = "Bcoz, Chat Feature is not CONNECTED in both MO & MT."
         driver1.quit()
         driver2.quit()
+
         end = datetime.datetime.now()
         # finishing test report
         report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -3801,7 +4084,7 @@ def IPME_Wave1_stability_test():
         report[6] = test_count
         report[7] = pass_count
         report[8] = fail_count
-        report[9] = round((pass_count / test_count) * 100, 2)
+        report[9] = round((pass_count / iterate) * 100, 2)
         report[10] = None
         report[11] = None
 
@@ -3820,121 +4103,101 @@ def IPME_Wave1_stability_test():
         # connecting devices
         driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
         driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
-        # enable cellular network only
+        # enable WiFi only
         driver1.set_network_connection(2)
         driver2.set_network_connection(2)
-        # enable chat features if disabled
-        enable_chat_feature(driver1)
-        enable_chat_feature(driver2)
+        print("-->> Only WiFi Enabled on both MO & MT")
+        # enable chat features if disabled & check status
+        print("MO Device :")
+        f1 = enable_chat_feature(driver1)
+        print("MT Device :")
+        f2 = enable_chat_feature(driver2)
+
         # loop variable initiation
         pass_count, fail_count, test_count = 0, 0, 0
         start = datetime.datetime.now()
-        while test_count < iterate:
-            try:
-                # launch message app
-                driver1.activate_app(MSG_APP_PACKAGE)
-                time.sleep(2)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
-                    PH_NUMBER_2)
-                driver1.press_keycode(66)
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ID,
-                                     "com.google.android.apps.messaging:id/compose_message_text").send_keys(MSG_TEXT)
-                time.sleep(2)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Send SMS").click()
-                # check sent or failed
-                time.sleep(2)
-                if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Now, SMS").text == "Now • SMS":
-                    pass_count += 1
-                else:
-                    fail_count += 1
-                driver1.press_keycode(4)
-                driver1.press_keycode(4)
-                driver1.press_keycode(3)
-            except Exception as e:
-                print(f"Iteration = {test_count + 1}| Texting Chat mode over WiFi Failed! | with Error : {e}")
-            test_count += 1
 
-        end = datetime.datetime.now()
-        # finishing test report
-        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        report[5] = str(end - start).split('.')[0]
-        report[6] = test_count
-        report[7] = pass_count
-        report[8] = fail_count
-        report[9] = round((pass_count / test_count) * 100, 2)
-        report[10] = None
-        report[11] = None
-
-        # insert test report to csv file
-        with open('automation_stability_test.csv', 'a') as f:
-            writer(f).writerow(report)
-            f.close()
-        print("\n", "Event 5 completed!")
-
-    def file_transfer_wifi(iterate=20):
-        print('\n', "Event 6 : File Transfer over WiFi")
-        # test report initiation
-        report[1] = 'File Transfer over WiFi'
-        report[2] = iterate
-        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        # connecting devices
-        driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
-        driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
-        # enable cellular network only
-        driver1.set_network_connection(2)
-        driver2.set_network_connection(2)
-        # enable chat features if disabled
-        enable_chat_feature(driver1)
-        enable_chat_feature(driver2)
-        # loop variable initiation
-        pass_count, fail_count, test_count = 0, 0, 0
-        start = datetime.datetime.now()
-        while test_count < iterate:
-            try:
-                # launch message app
-                driver1.activate_app(MSG_APP_PACKAGE)
-                time.sleep(2)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
-                time.sleep(1)
-                driver1.find_element(AppiumBy.ID, "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
-                    PH_NUMBER_2)
-                driver1.press_keycode(66)
-                time.sleep(2)
-                # attatchment section
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Add files, location and more").click()
-                time.sleep(1)
-                driver1.find_element(AppiumBy.XPATH,
-                                     '//android.view.ViewGroup[@content-desc="Files"]/android.widget.ImageView').click()
-                time.sleep(2)
-                # file selection
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Show roots").click()
-                time.sleep(1)
-                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    if i.text == "Downloads":
-                        i.click()
-                        break
-                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
-                    if i.text == "sample-pdf-file.pdf":
-                        i.click()
-                        break
-                time.sleep(2)
-                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Send SMS").click()
-                # check sent or failed
-                time.sleep(60)
-                if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Now, SMS").text == "Now • SMS":
-                    pass_count += 1
-                else:
-                    fail_count += 1
-                driver1.press_keycode(4)
-                driver1.press_keycode(4)
-                driver1.press_keycode(3)
-            except Exception as e:
-                fail_count += 1
-                print(f"Iteration = {test_count + 1}| File Transfer over WiFi Failed! | with Error : {e}")
-            test_count += 1
+        if f1 & f2:
+            while test_count < iterate:
+                try:
+                    if test_count == 0:
+                        # launch message app
+                        driver1.activate_app(MSG_APP_PACKAGE)
+                        time.sleep(2)
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
+                        time.sleep(1)
+                        driver1.find_element(AppiumBy.ID,
+                                             "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
+                            PH_NUMBER_2)
+                        driver1.press_keycode(66)
+                        time.sleep(1)
+                        driver1.find_element(AppiumBy.ID,
+                                             "com.google.android.apps.messaging:id/compose_message_text").send_keys(
+                            MSG_TEXT)
+                        time.sleep(2)
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Send end-to-end encrypted message").click()
+                        # open MT chat box
+                        time.sleep(2)
+                        driver2.activate_app(MSG_APP_PACKAGE)
+                        time.sleep(2)
+                        for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                            if PH_NUMBER_1[:5] in i.text:
+                                i.click()
+                                break
+                        time.sleep(7)
+                        # check sent or failed
+                        if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Now, Read").text == "Now • Read":
+                            pass_count += 1
+                        else:
+                            fail_count += 1
+                    else:
+                        driver1.find_element(AppiumBy.ID,
+                                             "com.google.android.apps.messaging:id/compose_message_text").send_keys(
+                            MSG_TEXT)
+                        time.sleep(2)
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Send end-to-end encrypted message").click()
+                        # check sent or failed
+                        time.sleep(5)
+                        if driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Now, Read").text == "Now • Read":
+                            pass_count += 1
+                        else:
+                            fail_count += 1
+                except Exception as e:
+                    print(f"Iteration = {test_count + 1}| Texting Chat mode over WiFi Failed! | with Error : {e}")
+                test_count += 1
+                time.sleep(3)
+            # Delete msg on both MO & MT
+            time.sleep(3)
+            driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "More conversation options").click()
+            driver2.find_element(AppiumBy.ACCESSIBILITY_ID, "More conversation options").click()
+            time.sleep(2)
+            for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                if i.text == "Delete":
+                    i.click()
+                    break
+            for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                if i.text == "Delete":
+                    i.click()
+                    break
+            time.sleep(2)
+            driver1.find_element(AppiumBy.ID, "android:id/button1").click()
+            driver2.find_element(AppiumBy.ID, "android:id/button1").click()
+            time.sleep(2)
+            driver1.press_keycode(4)
+            driver2.press_keycode(4)
+            driver1.press_keycode(3)
+            driver2.press_keycode(3)
+            report[10] = None
+            report[11] = None
+        elif f1:
+            report[10] = "Unable to perform Event 1 : Texting Chat mode over WiFi"
+            report[11] = "Bcoz, Chat Feature is not CONNECTED in MT."
+        elif f2:
+            report[10] = "Unable to perform Event 1 : Texting Chat mode over WiFi"
+            report[11] = "Bcoz, Chat Feature is not CONNECTED in M0."
+        else:
+            report[10] = "Unable to perform Event 1 : Texting Chat mode over WiFi "
+            report[11] = "Bcoz, Chat Feature is not CONNECTED in both MO & MT."
         driver1.quit()
         driver2.quit()
         end = datetime.datetime.now()
@@ -3945,8 +4208,168 @@ def IPME_Wave1_stability_test():
         report[7] = pass_count
         report[8] = fail_count
         report[9] = round((pass_count / test_count) * 100, 2)
-        report[10] = None
-        report[11] = None
+
+        # insert test report to csv file
+        with open('automation_stability_test.csv', 'a') as f:
+            writer(f).writerow(report)
+            f.close()
+        print("\n", "Event 1 completed!")
+
+    def file_transfer_wifi(iterate=20):
+        print('\n', "Event 6 : File Transfer over WiFi")
+        # test report initiation
+        report[1] = 'File Transfer over WiFi'
+        report[2] = iterate
+        report[3] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        # connecting devices
+        driver1 = webdriver.Remote("http://0.0.0.0:4727/wd/hub", desired_cap)
+        driver2 = webdriver.Remote("http://0.0.0.0:4728/wd/hub", desired_cap_2)
+        # enable WiFi only
+        driver1.set_network_connection(2)
+        driver2.set_network_connection(2)
+        print("-->> Only WiFi Enabled on both MO & MT")
+        # enable chat features if disabled & check status
+        print("MO Device :")
+        f1 = enable_chat_feature(driver1)
+        print("MT Device :")
+        f2 = enable_chat_feature(driver2)
+
+        # loop variable initiation
+        pass_count, fail_count, test_count = 0, 0, 0
+        start = datetime.datetime.now()
+
+        if f1 & f2:
+            while test_count < iterate:
+                try:
+                    if test_count == 0:
+                        # launch message app
+                        driver1.activate_app(MSG_APP_PACKAGE)
+                        time.sleep(2)
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Start chat").click()
+                        time.sleep(1)
+                        driver1.find_element(AppiumBy.ID,
+                                             "com.google.android.apps.messaging:id/recipient_text_view").send_keys(
+                            PH_NUMBER_2)
+                        driver1.press_keycode(66)
+                        time.sleep(3)
+
+                        # attachment section
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Add files, location and more").click()
+                        time.sleep(1)
+                        driver1.find_element(AppiumBy.XPATH,
+                                             '//android.view.ViewGroup[@content-desc="Files"]/android.widget.ImageView').click()
+                        time.sleep(2)
+                        # file selection
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Show roots").click()
+                        time.sleep(3)
+                        for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                            if i.text == "Downloads":
+                                i.click()
+                                break
+                        time.sleep(2)
+                        for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                            if i.text == "Free_Test_Data_10MB_MP4.mp4":
+                                i.click()
+                                break
+                        time.sleep(2)
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Send end-to-end encrypted message").click()
+                        flag = True
+                        while flag:
+                            # open MT chat box
+                            driver1.activate_app(MSG_APP_PACKAGE)
+                            time.sleep(2)
+                            for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                                if PH_NUMBER_1[:5] in i.text:
+                                    i.click()
+                                    flag = False
+                                    break
+                        time.sleep(5)
+                        # check sent or failed
+                        status = driver1.find_element(AppiumBy.ID,
+                                                      "com.google.android.apps.messaging:id/message_status").text
+                        if "Seen" in status:
+                            pass_count += 1
+                        else:
+                            fail_count += 1
+
+                    else:
+                        # attachment section
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Add files, location and more").click()
+                        time.sleep(1)
+                        driver1.find_element(AppiumBy.XPATH,
+                                             '//android.view.ViewGroup[@content-desc="Files"]/android.widget.ImageView').click()
+                        time.sleep(2)
+                        # file selection
+                        for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                            if i.text == "Free_Test_Data_10MB_MP4.mp4":
+                                i.click()
+                                break
+                        time.sleep(2)
+                        driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "Send end-to-end encrypted message").click()
+                        flag = True
+                        while flag:
+                            driver2.activate_app(MSG_APP_PACKAGE)
+                            status = driver1.find_element(AppiumBy.ID,
+                                                          "com.google.android.apps.messaging:id/message_status").text
+                            if "Seen" in status:
+                                flag = False
+                        status = driver1.find_element(AppiumBy.ID,
+                                                      "com.google.android.apps.messaging:id/message_status").text
+                        if "Seen" in status:
+                            pass_count += 1
+                        else:
+                            fail_count += 1
+                    driver1.press_keycode(4)
+                except Exception as e:
+                    fail_count += 1
+                    print(f"Iteration = {test_count + 1}| File Transfer over WiFi Failed! | with Error : {e}")
+                test_count += 1
+                time.sleep(3)
+            try:
+                # Delete msg on both MO & MT
+                time.sleep(3)
+                driver1.find_element(AppiumBy.ACCESSIBILITY_ID, "More conversation options").click()
+                driver2.find_element(AppiumBy.ACCESSIBILITY_ID, "More conversation options").click()
+                time.sleep(2)
+                for i in driver1.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "Delete":
+                        i.click()
+                        break
+                for i in driver2.find_elements(AppiumBy.CLASS_NAME, "android.widget.TextView"):
+                    if i.text == "Delete":
+                        i.click()
+                        break
+                time.sleep(2)
+                driver1.find_element(AppiumBy.ID, "android:id/button1").click()
+                driver2.find_element(AppiumBy.ID, "android:id/button1").click()
+                time.sleep(2)
+                driver1.press_keycode(4)
+                driver2.press_keycode(4)
+                driver1.press_keycode(3)
+                driver2.press_keycode(3)
+                report[10] = None
+                report[11] = None
+            except:
+                print("Failed to Delete messages")
+        elif f1:
+            report[10] = "Unable to perform Event 6 : File Transfer over WiFi "
+            report[11] = "Bcoz, Chat Feature is not CONNECTED in MT."
+        elif f2:
+            report[10] = "Unable to perform Event 6 : File Transfer over WiFi "
+            report[11] = "Bcoz, Chat Feature is not CONNECTED in M0."
+        else:
+            report[10] = "Unable to perform Event 6 : File Transfer over WiFi "
+            report[11] = "Bcoz, Chat Feature is not CONNECTED in both MO & MT."
+        driver1.quit()
+        driver2.quit()
+        end = datetime.datetime.now()
+        # finishing test report
+        report[4] = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        report[5] = str(end - start).split('.')[0]
+        report[6] = test_count
+        report[7] = pass_count
+        report[8] = fail_count
+        report[9] = round((pass_count / test_count) * 100, 2)
 
         # insert test report to csv file
         with open('automation_stability_test.csv', 'a') as f:
@@ -3954,12 +4377,12 @@ def IPME_Wave1_stability_test():
             f.close()
         print("\n", "Event 6 completed!")
 
-    texting_chat_mode()
-    texting_pager_mode()
-    file_transfer()
-    large_msg_mode()
-    texting_chat_mode_wifi()
-    file_transfer_wifi()
+    texting_chat_mode(3)
+    texting_pager_mode(3)
+    file_transfer(3)
+    large_msg_mode(3)
+    texting_chat_mode_wifi(3)
+    file_transfer_wifi(3)
 
 
 def IPME_Wave2_stability_test():
@@ -4330,7 +4753,7 @@ def IPME_Wave2_stability_test():
     file_transfer_wifi()
 
 
-Messaging_Stability_Tests()
+# Messaging_Stability_Tests()
 # Email_Stability_Test()
 # Browser_Stability_Test()
 # Multimedia_Stability_Test()
@@ -4341,5 +4764,5 @@ Messaging_Stability_Tests()
 # Video_Telephony_Stability_Test()
 # wifi_calling_stability_test()
 # PIM_stability_test()
-# IPME_Wave1_stability_test()
+IPME_Wave1_stability_test()
 # IPME_Wave2_stability_test()
